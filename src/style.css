@@ -6,3 +6,99 @@
   padding: 0;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
+:root {
+  --text-color: rgb(220, 220, 220);
+  --secondary-text: rgb(180, 180, 180);
+  --accent-text: rgb(100, 150, 250);
+  --secondary-accent: rgb(255, 165, 0);
+  --primary-color: rgb(55, 55, 55);
+  --secondary-color: rgb(75, 75, 75);
+  --input-buttons-color: rgb(85, 85, 85);
+  --border-color: rgb(100, 100, 100);
+  --neutral-button: rgb(120, 120, 120);
+  --buttons-hover: rgb(150, 150, 150);
+  --highlights: rgb(85, 107, 47);
+  --alerts-color: rgb(255, 69, 0);
+  --success: rgb(50, 205, 50);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  background-color: var(--primary-color);
+  align-items: center;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-content {
+  margin: 20px;
+
+  border: 2px solid white;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+}
+
+.greeting-wrapper {
+  display: flex;
+  flex-direction: row;
+  color: var(--text-color);
+  align-items: center;
+  margin: 5px;
+  padding: 10px;
+  width: fit-content;
+}
+.username-greeting {
+  color: var(--secondary-accent);
+  padding: 5px;
+  font-size: 1.5em;
+}
+
+.weather-report-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.weekly {
+  display: flex;
+  justify-content: space-around;
+  flex-basis: 100%;
+  align-items: center;
+  font-size: 1.5em;
+}
+.day {
+  color: var(--secondary-text);
+}
+.weather-data {
+  color: var(--accent-text);
+  font-size: 0.8em;
+}
+
+.unit-toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+  padding: 10px;
+}
+.units-lbl {
+  color: var(--text-color);
+  font-size: 1.2em;
+  padding-right: 5px;
+}
+.units-toggle {
+  width: 20px;
+  height: 20px;
+  margin: 5px;
+}
