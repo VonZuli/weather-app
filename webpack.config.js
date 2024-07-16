@@ -18,12 +18,8 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|svg|gif)$/i,
         type: "asset/resource",
-      },
-      {
-        test: /\.svg/,
-        type: "asset",
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
