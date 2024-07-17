@@ -7,9 +7,9 @@ const images = require.context("../src/assets/images", true);
 export const imagepath = (name) => images(name, true);
 
 const sunSVG = imagepath("./retrowave_sunset.svg");
-
+const searchSVG = imagepath("./search.svg");
 //change to greeting with value based on ToD
-let greeting = "Good Morning";
+let greeting = "GOOD MORNING";
 
 let headerContainer = createElem(
   "div",
@@ -19,7 +19,7 @@ let headerContainer = createElem(
     "div",
     { class: "header_container" },
     {},
-    createElem("h2", { class: "greeting" }, {}, "Hello there, "),
+    createElem("h2", { class: "greeting" }, {}, "HELLO THERE, "),
     createElem("span", { class: "tod-greeting" }, {}, `${greeting}`)
   ),
   createElem(
@@ -31,25 +31,31 @@ let headerContainer = createElem(
       { class: "location-search_input", placeholder: "Search Location..." },
       {}
     ),
-    createElem("button", { class: "search_btn" }, {}, "🔍")
+    createElem(
+      "button",
+      { class: "search_btn" },
+      {},
+      createElem("img", { src: searchSVG }, {})
+    )
   ),
   createElem(
     "div",
-    { class: "unit-toggle_wrapper" },
+    { class: "unit-toggle_container" },
     {},
+    createElem("h3", { class: "unit-title" }, {}, "Select Units"),
     createElem(
       "div",
-      { class: "unit-controls" },
+      { class: "unit-toggle_wrapper" },
       {},
-      createElem("label", { class: "units-lbl" }, {}, "Select units")
-    ),
-    createElem(
-      "div",
-      { class: "toggle-content" },
-      {},
-      createElem("p", { class: "celsius" }, {}, "℃"),
-      createElem("input", { class: "units-toggle", type: "checkbox" }, {}),
-      createElem("p", { class: "fahrenheit" }, {}, "℉")
+      createElem("p", { class: "celsius" }, {}, "°C"),
+      createElem(
+        "label",
+        { class: "switch" },
+        {},
+        createElem("input", { class: "unit-toggle", type: "checkbox" }, {}),
+        createElem("span", { class: "slider" }, {})
+      ),
+      createElem("p", { class: "fahrenheit" }, {}, "°F")
     )
   )
 );
@@ -70,9 +76,8 @@ const weatherPrimaryInfo = createElem(
         "div",
         { class: "general-top_wrapper" },
         {},
-        createElem("h2", { class: "location" }, {}, "Location"),
-        createElem("h3", { class: "date" }, {}, "Date"),
-        createElem("h5", { class: "time" }, {}, "Time")
+        createElem("h2", { class: "location" }, {}, "MIAMI"),
+        createElem("img", { class: "weather-condition-icon", src: sunSVG }, {})
       ),
       createElem(
         "div",
@@ -82,18 +87,27 @@ const weatherPrimaryInfo = createElem(
           "div",
           { class: "flex-wrapper" },
           {},
-          createElem("h1", { class: "temperature" }, {}, "Temp"),
           createElem(
-            "img",
-            { class: "weather-condition-icon", src: sunSVG },
-            {}
+            "div",
+            { class: "flex-sub-wrapper" },
+            {},
+            createElem("h3", { class: "date" }, {}, "JULY 4th, 1986"),
+            createElem("h5", { class: "time" }, {}, "07:35:49")
+          ),
+          createElem(
+            "h1",
+            { class: "temperature" },
+            {},
+            25,
+            createElem("sup", { class: "large" }, {}, "°C")
           )
         ),
+
         createElem(
           "h2",
           { class: "weather-condition-description" },
           {},
-          "Description"
+          "SUNSHINE"
         )
       )
     )
@@ -115,13 +129,13 @@ const forecast = createElem(
         "button",
         { class: "range-select_btn", id: "hourly" },
         {},
-        "Hourly"
+        "HOURLY"
       ),
       createElem(
         "button",
         { class: "range-select_btn", id: "daily" },
         {},
-        "Daily"
+        "DAILY"
       )
     ),
     createElem(
@@ -148,13 +162,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Sunday",
+        "SUNDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       ),
@@ -162,13 +188,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Monday",
+        "MONDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       ),
@@ -176,13 +214,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Tuesday",
+        "TUESDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       ),
@@ -190,13 +240,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Wednesday",
+        "WEDNESDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       ),
@@ -204,13 +266,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Thursday",
+        "THURSDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       ),
@@ -218,13 +292,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Friday",
+        "FRIDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       ),
@@ -232,13 +318,25 @@ const forecast = createElem(
         "div",
         { class: "day" },
         {},
-        "Saturday",
+        "SATURDAY",
         createElem(
           "div",
           { class: "weather-data" },
           {},
-          createElem("h4", { class: "temp-high" }, {}, "High"),
-          createElem("h5", { class: "temp-low" }, {}, "Low"),
+          createElem(
+            "h4",
+            { class: "temp-high" },
+            {},
+            25,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low" },
+            {},
+            10,
+            createElem("sup", {}, {}, "°C")
+          ),
           createElem("img", { class: "condition", src: sunSVG }, {})
         )
       )
@@ -254,11 +352,77 @@ const weatherSecondaryInfo = createElem(
     "div",
     { class: "secondary-weather_container" },
     {},
-    createElem("h3", { class: "feels-like" }, {}, "Feels Like"),
-    createElem("h3", { class: "humidity-index" }, {}, "Humidity"),
-    createElem("h3", { class: "pop" }, {}, "P.O.P."),
-    createElem("h3", { class: "wind-speed" }, {}, "Wind Speed"),
-    createElem("h3", { class: "wind-direction" }, {}, "Wind Direction")
+    createElem(
+      "div",
+      { class: "secondary-info-flex-wrapper" },
+      {},
+      createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+      createElem(
+        "div",
+        { class: "secondary-content-wrapper" },
+        {},
+        createElem("h3", { class: "feels-like" }, {}, "FEELS LIKE"),
+        createElem(
+          "h3",
+          { class: "secondary-content" },
+          {},
+          21,
+          createElem("sup", {}, {}, "°C")
+        )
+      )
+    ),
+    createElem(
+      "div",
+      { class: "secondary-info-flex-wrapper" },
+      {},
+      createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+      createElem(
+        "div",
+        { class: "secondary-content-wrapper" },
+        {},
+        createElem("h3", { class: "humidity-index" }, {}, "HUMIDITY"),
+        createElem("h3", { class: "secondary-content" }, {}, "68 %")
+      )
+    ),
+    createElem(
+      "div",
+      { class: "secondary-info-flex-wrapper" },
+      {},
+      createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+      createElem(
+        "div",
+        { class: "secondary-content-wrapper" },
+        {},
+        createElem("h3", { class: "pop" }, {}, "P.O.P."),
+        createElem("h3", { class: "secondary-content" }, {}, "0 %")
+      )
+    ),
+    createElem(
+      "div",
+      { class: "secondary-info-flex-wrapper" },
+      {},
+      createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+      createElem(
+        "div",
+        { class: "secondary-content-wrapper" },
+        {},
+        createElem("h3", { class: "wind-speed" }, {}, "WIND SPEED"),
+        createElem("h3", { class: "secondary-content" }, {}, "3.2 KMh")
+      )
+    ),
+    createElem(
+      "div",
+      { class: "secondary-info-flex-wrapper" },
+      {},
+      createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+      createElem(
+        "div",
+        { class: "secondary-content-wrapper" },
+        {},
+        createElem("h3", { class: "wind-direction" }, {}, "WIND DIRECTION"),
+        createElem("h3", { class: "secondary-content" }, {}, "SW ↙")
+      )
+    )
   )
 );
 
@@ -283,4 +447,4 @@ mainContent.appendChild(headerContainer);
 mainContent.appendChild(weatherPrimaryInfo);
 weatherPrimaryInfo.appendChild(forecast);
 weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
-mainContent.appendChild(weatherWarnings);
+forecast.appendChild(weatherWarnings);

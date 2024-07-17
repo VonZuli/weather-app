@@ -22,6 +22,18 @@
   --alerts-color: rgb(255, 69, 0);
   --success: rgb(50, 205, 50);
 }
+@font-face {
+  font-family: "Road Rage";
+  src: url("./assets/fonts/Road_Rage.otf") format("opentype");
+}
+@font-face {
+  font-family: "Digital Alarm";
+  src: url("./assets/fonts/alarm_clock.ttf") format("truetype");
+}
+@font-face {
+  font-family: "VCR Mono";
+  src: url("./assets/fonts/vcr_mono.ttf") format("truetype");
+}
 
 html {
   height: 100%;
@@ -41,16 +53,16 @@ body {
   margin: 20px;
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 99%;
   height: 100%;
   align-items: center;
 }
 /* #region header */
 .header {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  width: 99%;
 }
 .header_container {
   display: flex;
@@ -61,164 +73,277 @@ body {
   margin: 5px;
   padding: 10px;
 }
+.greeting {
+  font-family: "Road Rage";
+  font-weight: 100;
+}
 .tod-greeting {
-  color: var(--secondary-accent);
+  font-family: "Road Rage";
+  font-weight: 100;
+  color: var(--alerts-color);
   padding: 5px;
-  font-size: 1.5em;
+  font-size: 2em;
 }
 .search-bar_container {
   display: flex;
   flex-direction: row;
-  flex-basis: 60%;
-  justify-content: flex-start;
+  flex-basis: 40%;
+  justify-content: center;
 }
 .location-search_input {
-  height: 5em;
-  flex-basis: 80%;
-  padding: 1em;
+  /* height: 5em; */
+  flex-basis: 100%;
   background-color: transparent;
   border: none;
   border-bottom: 2px solid #c8c8c8;
+  color: var(--secondary-accent);
+  opacity: 100%;
+  font-family: "VCR Mono";
+  font-weight: 100;
+  font-size: 2em;
 }
 .location-search_input::placeholder {
-  font-size: 3em;
-  color: var(--secondary-accent);
+  font-family: "VCR Mono";
   opacity: 50%;
+  color: var(--secondary-accent);
 }
 .search_btn {
+  display: flex;
+  align-items: center;
   font-size: 1.5em;
-  width: 2.75em;
-  background-color: RGB(10, 3, 30);
+  /* background-color: rgb(10, 3, 30); */
   border: none;
 }
+.search_btn > img {
+  width: 3em;
+  border-bottom: 2px solid #c8c8c8;
+}
 .search_btn:hover {
-  font-size: 1.5em;
-  width: 2.75em;
-  background-color: #c8c8c840;
-  border: none;
+  /* border: 2px solid #c8c8c8; */
+  border-top: 2px solid #c8c8c8;
+  border-right: 2px solid #c8c8c8;
+  border-left: 2px solid #c8c8c8;
+  /* background-color: #c8c8c840; */
+}
+.unit-toggle_container {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 20%;
+  justify-content: center;
+  align-items: center;
+}
+.unit-title {
+  color: var(--secondary-accent);
+  font-size: 1.2em;
+  padding-right: 5px;
+  font-family: "Road Rage";
 }
 .unit-toggle_wrapper {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 5px;
-  padding: 10px;
 }
-.unit-controls {
-  display: flex;
-}
-.toggle-content {
-  display: flex;
-  width: 100%;
-  margin: 5px;
+.unit-toggle_wrapper > p {
+  font-size: 2em;
+  font-family: "Digital Alarm";
   color: var(--text-color);
-  justify-content: space-around;
+  margin: 0.2em;
 }
-.units-lbl {
-  color: var(--text-color);
-  font-size: 1.2em;
-  padding-right: 5px;
+.switch {
+  position: relative;
+  display: inline-flex;
+  margin: 0.5em;
+  width: 60px;
+  height: 34px;
 }
-.units-toggle {
-  width: 20px;
-  height: 20px;
-  margin: 5px;
+.unit-toggle {
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--neutral-button);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+input:checked + .slider {
+  background-color: var(--secondary-accent);
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px rgb(10, 3, 30);
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
 /*#endregion header*/
 
-/*#region primary*/
 .primary-info_container {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin: 6em 0;
+  margin: 4em 0;
 }
 .primary-info_container > * {
   color: var(--text-color);
   height: 50vh;
 }
+/*#region current*/
 .current-weather_container {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  flex-basis: 20%;
+  /* justify-content: space-around; */
+  flex-basis: 22%;
+  margin: 1em;
+  height: fit-content;
 }
 
 .general-info_container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   align-content: center;
-  height: 100%;
+  height: fit-content;
+  border: 2px solid var(--border-color);
+  padding: 0.5em;
 }
 .general-top_wrapper {
-  margin: 1.2em;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 0.3em;
 }
-.general-top_wrapper > * {
-  height: 100%;
-  justify-content: space-between;
+
+.location {
+  font-family: "Road Rage";
+  color: var(--alerts-color);
+  font-weight: 100;
+  font-size: 4em;
+  padding: 5px;
+  flex-basis: 100%;
+  height: 200px;
+}
+.date {
+  font-family: "Road Rage";
+  font-size: 1.3em;
+  font-weight: 100;
+  padding: 0.2em;
+}
+.time {
+  font-family: "Digital Alarm";
+  font-size: 1em;
+  font-weight: 100;
+  padding: 0.2em;
 }
 .general-bottom_wrapper {
-  /* margin: 1.2em; */
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0.5em;
 }
 .flex-wrapper {
   display: flex;
   justify-content: space-between;
-}
-.temperature {
-  display: flex;
-  justify-content: center;
   align-items: center;
   flex-basis: 100%;
 }
+.flex-sub-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  margin: 0.3em;
+}
+.temperature {
+  display: flex;
+  font-size: 6.5em;
+  font-weight: 100;
+  padding: 0.05em;
+  /* flex-basis: 100%; */
+  font-family: "Digital Alarm";
+}
+sup.large {
+  font-family: "Digital Alarm";
+  font-size: 0.5em;
+  margin-top: 0.2em;
+  flex-basis: 100%;
+}
 .weather-condition-icon {
-  width: 10em;
+  width: 20em;
+  flex-basis: 100%;
 }
 .weather-condition-description {
   display: flex;
-  margin: 0.3em;
-
+  font-size: 2em;
   align-items: center;
-  justify-content: center;
+  font-family: "Road Rage";
+  font-weight: 100;
+  color: var(--secondary-accent);
 }
-/*#endregion primary*/
+/*#endregion current*/
 
 /*#region forecast*/
 .forecast_container {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  flex-basis: 60%;
+  margin: 1em;
+  border: 2px solid var(--border-color);
+  height: fit-content;
 }
 .forecast-controls {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
-  margin: 2em 0;
 }
 .forecast-range-select {
   display: flex;
-  margin: 1.5em;
+  margin: 0.5em;
 }
 .forecast-range-select > button {
-  height: 50px;
+  font-family: "Road Rage";
+  font-weight: 100;
+  font-size: 1.3em;
+  color: var(--primary-color);
+  height: 35px;
   width: 100px;
   margin: 0.3em;
   background-color: var(--secondary-accent);
   border: none;
-  font-size: 1em;
+  cursor: pointer;
+}
+.forecast-range-select > button:hover {
+  background-color: #f34c87;
 }
 .daily-pagination-controls {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   color: #c8c8c8;
-  margin: 1.5em;
+  margin: 1em;
 }
 .weather-report_container {
   display: flex;
@@ -226,6 +351,7 @@ body {
   justify-content: center;
   margin: 1em;
   border: 2px solid var(--border-color);
+  flex-basis: 100%;
 }
 .weekly {
   display: flex;
@@ -240,8 +366,10 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: var(--secondary-text);
+  color: var(--alerts-color);
   min-width: 120px;
+  font-family: "Road Rage";
+  font-weight: 100;
 }
 .weather-data {
   display: flex;
@@ -256,13 +384,21 @@ body {
 .weather-data > * {
   align-content: center;
 }
+sup {
+  font-family: "Digital Alarm";
+  font-size: 0.5em;
+}
 .temp-high {
   font-size: 2em;
+  font-family: "Digital Alarm";
   color: var(--secondary-accent);
+  font-weight: 100;
 }
 .temp-low {
+  font-family: "Digital Alarm";
   font-size: 1.5em;
   color: var(--accent-text);
+  font-weight: 100;
 }
 /*#endregion forecast*/
 
@@ -270,18 +406,42 @@ body {
 .secondary-weather-info_container {
   display: flex;
   flex-basis: 20%;
-  margin-left: 2em;
+  margin: 1em;
+  border: 2px solid var(--border-color);
 }
 .secondary-weather_container {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-content: center;
+  flex-basis: 100%;
 }
-.secondary-weather_container > h3 {
-  font-size: 1.3em;
+
+.secondary-info-flex-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-basis: 100%;
+  height: 1em;
+}
+.secondary-svg {
+  margin: 1em;
+  width: 3em;
+}
+.secondary-content-wrapper {
+  flex-basis: 100%;
+  margin: 1em 0;
+}
+.secondary-content-wrapper > * {
+  padding: 0.2em;
   color: var(--text-color);
-  margin: 1.3em 0;
+  font-family: "VCR Mono";
+  font-weight: 100;
+}
+.secondary-content {
+  font-family: "Digital Alarm";
+  font-weight: 100;
+  font-size: 1.5em;
 }
 /*#endregion secondary*/
 
@@ -290,10 +450,14 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 60%;
+  margin: 1em;
   align-items: center;
+  border: 2px solid var(--border-color);
 }
 .extreme-weather_container > h2 {
+  font-family: "Road Rage";
+  font-size: 2em;
+  font-weight: 100;
   align-items: center;
   align-content: center;
   color: var(--alerts-color);
@@ -304,5 +468,8 @@ body {
   align-content: center;
   color: var(--text-color);
   margin: 0.5em;
+  font-family: "VCR Mono";
+  font-weight: 100;
+  width: 75%;
 }
 /*#endregion alerts*/
