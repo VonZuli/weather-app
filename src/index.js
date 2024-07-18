@@ -8,6 +8,9 @@ export const imagepath = (name) => images(name, true);
 
 const sunSVG = imagepath("./retrowave_sunset.svg");
 const searchSVG = imagepath("./search.svg");
+const leftArrowSVG = imagepath("./left-arrow.svg");
+const rightArrowSVG = imagepath("./right-arrow.svg");
+const outrunGIF = imagepath("./outrun.gif");
 //change to greeting with value based on ToD
 let greeting = "GOOD MORNING";
 
@@ -142,12 +145,16 @@ const forecast = createElem(
       "div",
       { class: "daily-pagination-controls" },
       {},
-      createElem("div", { class: "control_left" }, {}, "◀"),
-      createElem("div", { class: "dot" }, {}, "🔴"),
-
-      createElem("div", { class: "dot" }, {}, "⭕"),
-      createElem("div", { class: "dot" }, {}, "⭕"),
-      createElem("div", { class: "control_right" }, {}, "▶")
+      createElem(
+        "div",
+        { class: "controls-wrapper" },
+        {},
+        createElem("img", { class: "page-left", src: leftArrowSVG }, {}),
+        createElem("div", { class: "dot active" }, {}),
+        createElem("div", { class: "dot" }, {}),
+        createElem("div", { class: "dot" }, {}),
+        createElem("img", { class: "page-right", src: rightArrowSVG }, {})
+      )
     )
   ),
   createElem(
@@ -423,6 +430,12 @@ const weatherSecondaryInfo = createElem(
         createElem("h3", { class: "secondary-content" }, {}, "SW ↙")
       )
     )
+  ),
+  createElem(
+    "div",
+    { class: "gif-container" },
+    {},
+    createElem("img", { class: "outrunGIF", src: outrunGIF }, {})
   )
 );
 
@@ -446,5 +459,5 @@ const weatherWarnings = createElem(
 mainContent.appendChild(headerContainer);
 mainContent.appendChild(weatherPrimaryInfo);
 weatherPrimaryInfo.appendChild(forecast);
-weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
 forecast.appendChild(weatherWarnings);
+weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
