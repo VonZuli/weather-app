@@ -14,6 +14,7 @@ const outrunGIF = imagepath("./outrun.gif");
 //change to greeting with value based on ToD
 let greeting = "GOOD MORNING";
 
+//#region init
 let headerContainer = createElem(
   "div",
   { class: "header" },
@@ -31,7 +32,11 @@ let headerContainer = createElem(
     {},
     createElem(
       "input",
-      { class: "location-search_input", placeholder: "Search Location..." },
+      {
+        id: "search",
+        class: "location-search_input",
+        placeholder: "Search Location...",
+      },
       {}
     ),
     createElem(
@@ -45,7 +50,7 @@ let headerContainer = createElem(
     "div",
     { class: "unit-toggle_container" },
     {},
-    createElem("h3", { class: "unit-title" }, {}, "Select Units"),
+    createElem("h3", { class: "unit-title" }, {}, "SELECT UNITS"),
     createElem(
       "div",
       { class: "unit-toggle_wrapper" },
@@ -94,7 +99,7 @@ const weatherPrimaryInfo = createElem(
             "div",
             { class: "flex-sub-wrapper" },
             {},
-            createElem("h3", { class: "date" }, {}, "JULY 4th, 1986"),
+            createElem("h3", { class: "date" }, {}, "JULY 4th 1986"),
             createElem("h5", { class: "time" }, {}, "07:35:49")
           ),
           createElem(
@@ -461,3 +466,28 @@ mainContent.appendChild(weatherPrimaryInfo);
 weatherPrimaryInfo.appendChild(forecast);
 forecast.appendChild(weatherWarnings);
 weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
+//#endregion init
+
+//#region API call
+const search = document.querySelector("#search");
+async function getWeatherData() {
+  let keyword = search.value;
+
+  try {
+    const response = await fetch(
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${keyword}?unitGroup=metric&key=5YWV9ZDBX4LKSZC48LHFQPNWH&contentType=json`,
+      { mode: "cors" }
+    );
+    const weatherData = await response.json();
+    console.log(weatherData);
+  } catch (error) {
+    console.error(`ERROR: ${error}`);
+  }
+  // setTimeout(() => {
+  //   // console.log(weatherData);
+  // }, 200);
+}
+let searchBtn = document.querySelector(".search_btn");
+
+searchBtn.addEventListener("click", getWeatherData);
+//#endregion API call
