@@ -31,19 +31,30 @@ let headerContainer = createElem(
     { class: "search-bar_container" },
     {},
     createElem(
-      "input",
+      "form",
+      { class: "location-form" },
       {
-        id: "search",
-        class: "location-search_input",
-        placeholder: "Search Location...",
+        submit: (e) => {
+          e.preventDefault();
+          getWeatherData();
+        },
       },
-      {}
-    ),
-    createElem(
-      "button",
-      { class: "search_btn" },
-      {},
-      createElem("img", { src: searchSVG }, {})
+      createElem(
+        "input",
+        {
+          id: "search",
+          class: "location-search_input",
+          placeholder: "Search Location...",
+        },
+        {}
+      ),
+      createElem(
+        "button",
+        { class: "search_btn", type: "submit", form: "search" },
+        { click: getWeatherData },
+        "SEARCH"
+        // createElem("img", { src: searchSVG }, {})
+      )
     )
   ),
   createElem(
@@ -373,10 +384,10 @@ const weatherSecondaryInfo = createElem(
         "div",
         { class: "secondary-content-wrapper" },
         {},
-        createElem("h3", { class: "feels-like" }, {}, "FEELS LIKE"),
+        createElem("h3", { class: "secondary-content " }, {}, "FEELS LIKE"),
         createElem(
           "h3",
-          { class: "secondary-content" },
+          { class: "feels-like" },
           {},
           21,
           createElem("sup", {}, {}, "°C")
@@ -392,8 +403,8 @@ const weatherSecondaryInfo = createElem(
         "div",
         { class: "secondary-content-wrapper" },
         {},
-        createElem("h3", { class: "humidity-index" }, {}, "HUMIDITY"),
-        createElem("h3", { class: "secondary-content" }, {}, "68 %")
+        createElem("h3", { class: " secondary-content " }, {}, "HUMIDITY"),
+        createElem("h3", { class: "humidity-index" }, {}, "68 %")
       )
     ),
     createElem(
@@ -405,8 +416,8 @@ const weatherSecondaryInfo = createElem(
         "div",
         { class: "secondary-content-wrapper" },
         {},
-        createElem("h3", { class: "pop" }, {}, "P.O.P."),
-        createElem("h3", { class: "secondary-content" }, {}, "0 %")
+        createElem("h3", { class: "secondary-content" }, {}, "P.O.P."),
+        createElem("h3", { class: "pop" }, {}, "0 %")
       )
     ),
     createElem(
@@ -418,8 +429,8 @@ const weatherSecondaryInfo = createElem(
         "div",
         { class: "secondary-content-wrapper" },
         {},
-        createElem("h3", { class: "wind-speed" }, {}, "WIND SPEED"),
-        createElem("h3", { class: "secondary-content" }, {}, "3.2 KMh")
+        createElem("h3", { class: "secondary-content " }, {}, "WIND SPEED"),
+        createElem("h3", { class: "wind-speed" }, {}, "3.2 KMh")
       )
     ),
     createElem(
@@ -431,8 +442,8 @@ const weatherSecondaryInfo = createElem(
         "div",
         { class: "secondary-content-wrapper" },
         {},
-        createElem("h3", { class: "wind-direction" }, {}, "WIND DIRECTION"),
-        createElem("h3", { class: "secondary-content" }, {}, "SW ↙")
+        createElem("h3", { class: "secondary-content" }, {}, "WIND DIRECTION"),
+        createElem("h3", { class: "wind-direction" }, {}, "SW ↙")
       )
     )
   ),
@@ -470,6 +481,19 @@ weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
 
 //#region API call
 const search = document.querySelector("#search");
+const location = document.querySelector(".location");
+const date = document.querySelector(".date");
+const time = document.querySelector(".time");
+const feelslike = document.querySelector(".feels-like");
+const humidity = document.querySelector(".humidity-index");
+const pop = document.querySelector(".pop");
+const windSpeed = document.querySelector(".wind-speed");
+const windDirection = document.querySelector(".wind-direction");
+const temperature = document.querySelector(".temperature");
+const weatherCondition = document.querySelector(
+  ".weather-condition-description"
+);
+
 async function getWeatherData() {
   let keyword = search.value;
 
@@ -479,7 +503,21 @@ async function getWeatherData() {
       { mode: "cors" }
     );
     const weatherData = await response.json();
-    console.log(weatherData);
+
+    location.textContent = weatherData.address;
+    weatherCondition.textContent = weatherData.currentConditions.conditions;
+    date.textContent = Date.now();
+    temperature.textContent =
+      Math.round(weatherData.currentConditions.temp) + "°C";
+    time.textContent = weatherData.currentConditions.datetime;
+    feelslike.textContent = weatherData.currentConditions.feelslike;
+    humidity.textContent = weatherData.currentConditions.humidity;
+    pop.textContent = weatherData.currentConditions.precipprob;
+    windSpeed.textContent = weatherData.currentConditions.windspeed;
+    windDirection.textContent = weatherData.currentConditions.winddir;
+
+    search.value = "";
+    console.log(keyword, weatherData);
   } catch (error) {
     console.error(`ERROR: ${error}`);
   }
@@ -487,7 +525,5 @@ async function getWeatherData() {
   //   // console.log(weatherData);
   // }, 200);
 }
-let searchBtn = document.querySelector(".search_btn");
 
-searchBtn.addEventListener("click", getWeatherData);
 //#endregion API call
