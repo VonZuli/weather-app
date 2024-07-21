@@ -17,6 +17,7 @@
   --buttons-hover: rgb(243, 76, 135);
   --alerts-color: rgb(255, 69, 0);
   --box-shadow: rgb(10, 3, 30);
+  --active-btn: rgb(233, 3, 255);
 }
 @font-face {
   font-family: "Road Rage";
@@ -238,6 +239,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   /* flex-basis: 23%; */
+  /* max-width: 20%; */
   margin: 1em;
   height: fit-content;
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
@@ -264,7 +266,6 @@ input:checked + .slider:before {
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
   /* filter: drop-shadow(20px 20px 5px rgb(10, 3, 30)); */
 }
-
 .location {
   font-family: "Road Rage";
   color: var(--alerts-color);
@@ -274,17 +275,18 @@ input:checked + .slider:before {
   flex-basis: 100%;
   height: 200px;
 }
-.date {
-  font-family: "Road Rage";
-  font-size: 1.3em;
-  font-weight: 100;
-  padding: 0.2em;
+.weather-condition-icon {
+  width: 20em;
+  flex-basis: 100%;
 }
-.time {
-  font-family: "Digital Alarm";
-  font-size: 1em;
+.weather-condition-description {
+  display: flex;
+  justify-content: center;
+  font-size: 2em;
+  align-items: center;
+  font-family: "Road Rage";
   font-weight: 100;
-  padding: 0.2em;
+  color: var(--secondary-accent);
 }
 .general-bottom_wrapper {
   display: flex;
@@ -296,15 +298,31 @@ input:checked + .slider:before {
 }
 .flex-wrapper {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-basis: 100%;
 }
 .flex-sub-wrapper {
   display: flex;
   flex-direction: column;
+  flex-wrap: nowrap;
   flex-basis: 100%;
   margin: 0.3em;
+  min-width: fit-content;
+}
+.date {
+  font-family: "Road Rage";
+  font-size: 1.3em;
+  font-weight: 100;
+  padding: 0.2em;
+  width: fit-content;
+}
+.time {
+  font-family: "Digital Alarm";
+  font-size: 1em;
+  font-weight: 100;
+  padding: 0.2em;
+  text-align: left;
 }
 .temperature {
   display: flex;
@@ -320,18 +338,7 @@ sup.large {
   margin-top: 0.2em;
   flex-basis: 100%;
 }
-.weather-condition-icon {
-  width: 20em;
-  flex-basis: 100%;
-}
-.weather-condition-description {
-  display: flex;
-  font-size: 2em;
-  align-items: center;
-  font-family: "Road Rage";
-  font-weight: 100;
-  color: var(--secondary-accent);
-}
+
 /*#endregion current*/
 
 /*#region forecast*/
@@ -371,7 +378,9 @@ sup.large {
   background-color: var(--buttons-hover);
   scale: 0.9;
 }
-/* should probably wrap this */
+.forecast-range-select > button.active {
+  background-color: var(--active-btn);
+}
 .daily-pagination-controls {
   display: flex;
   justify-content: flex-end;
@@ -380,7 +389,7 @@ sup.large {
   margin: 0 1em 0 0;
 }
 .controls-wrapper {
-  display: flex;
+  display: none;
   justify-content: flex-end;
   flex-basis: 100%;
   align-items: center;
@@ -397,18 +406,18 @@ sup.large {
   scale: 1.1;
 }
 .dot {
-  border: 1px solid #e903ff;
+  border: 1px solid var(--active-btn);
   background-color: transparent;
   height: 0.5em;
   width: 0.5em;
   margin: 0.25em;
   cursor: pointer;
 }
-.dot:active {
-  background-color: #e903ff;
-}
+/* .dot:active {
+  background-color: var(--active-btn);
+} */
 .dot.active {
-  background-color: #e903ff;
+  background-color: var(--active-btn);
 }
 .weather-report_container {
   display: flex;
@@ -419,7 +428,7 @@ sup.large {
   flex-basis: 100%;
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
 }
-.weekly {
+.report-type_container {
   display: flex;
   justify-content: space-around;
   flex-basis: 100%;
@@ -428,17 +437,30 @@ sup.large {
   padding: 0.5em;
   /* filter: drop-shadow(20px 10px 4px rgb(10, 3, 30)); */
 }
+.forecast-daily {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3em;
+  box-shadow: 5px 5px 5px 5px var(--box-shadow);
+}
+.forecast-hourly {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3em;
+  box-shadow: 5px 5px 5px 5px var(--box-shadow);
+}
 .day {
   display: flex;
-  padding: 0.3em;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: var(--alerts-color);
   min-width: 120px;
   font-family: "Road Rage";
   font-weight: 100;
-  box-shadow: 5px 5px 5px 5px var(--box-shadow);
 }
 .weather-data {
   display: flex;
@@ -607,7 +629,7 @@ input:-webkit-autofill:active {
   .weather-report_container {
     flex-direction: column;
   }
-  .weekly {
+  .week {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
