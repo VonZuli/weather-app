@@ -331,6 +331,7 @@ input:checked + .slider:before {
   padding: 0.05em;
   /* flex-basis: 100%; */
   font-family: "Digital Alarm";
+  color: var(--secondary-accent);
 }
 sup.large {
   font-family: "Digital Alarm";
