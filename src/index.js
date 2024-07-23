@@ -67,7 +67,6 @@ async function reverseGeo(position) {
   try {
     const position = await getUserLocation();
     const populatedReportArr = await initWeatherData(position);
-    console.log(populatedReportArr);
 
     const cityName = populatedReportArr[0].city;
     const queryData = populatedReportArr[0].weatherData;
@@ -103,14 +102,225 @@ async function reverseGeo(position) {
       queryData,
       windDirection
     );
-    const forecastDisplay = createForecastDisplay(queryData);
+
+    function buildDailyForecast(queryData) {
+      const dailyArr = [...queryData.days.slice(1, 8)];
+      const weekday = [
+        "SUNDAY",
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY",
+      ];
+      dailyArr.forEach((i) => {
+        const dayName = parseISO(i.datetime);
+
+        let dailyReport = createElem(
+          "div",
+          { class: "slide_container", "data-report": "daily" },
+          {},
+          createElem(
+            "div",
+            { class: "forecast-daily", "data-day": dayName.getDay() },
+            {},
+            createElem("div", { class: "day" }, {}, weekday[dayName.getDay()]),
+            createElem(
+              "div",
+              { class: "weather-data" },
+              {},
+              createElem(
+                "h4",
+                { class: "temp-high" },
+                {},
+                `${Math.round(i.tempmax)}`,
+                createElem("sup", {}, {}, "°C")
+              ),
+              createElem(
+                "h5",
+                { class: "temp-low" },
+                {},
+                `${Math.round(i.tempmin)}`,
+                createElem("sup", {}, {}, "°C")
+              ),
+              createElem("img", { class: "condition", src: sunSVG }, {})
+            )
+          )
+        );
+        document
+          .querySelector(".weather-report_container")
+          .appendChild(dailyReport);
+      });
+    }
+
+    function buildHourlyForecast(queryData) {
+      const hour = queryData.days[0].hours;
+      const forecastDisplayReport = document.querySelector(".slide_container");
+      const frame = document.querySelector(".weather-report_container");
+      const slideArr = [];
+      slideArr.push(hour.slice(0, 8), hour.slice(8, 16), hour.slice(16, 24));
+
+      const sliderNavBtn = document.querySelectorAll(".slidernavBtn");
+      slideArr.forEach((_, index) => {
+        const hourlyContainer = createElem(
+          "div",
+          {
+            class: "slide_container",
+            id: `slide-${index + 1}`,
+            "data-report": "hourly",
+          },
+          {}
+        );
+        frame.appendChild(hourlyContainer);
+      });
+
+      sliderNavBtn.forEach((i, index) => {
+        i.setAttribute("href", `#slide-${index + 1}`);
+      });
+      document.querySelector(".slide_container").classList.add("active");
+      document.querySelector(".slidernavBtn").classList.add("active");
+
+      const controls = document.querySelectorAll(".controls");
+      controls.forEach((ctrl) => {
+        ctrl.addEventListener("click", (e) => {
+          const slides = document.querySelectorAll(".slide_container");
+          const currentSlide = document.querySelector(
+            ".slide_container.active"
+          );
+          const currentNavBtn = document.querySelector(".slidernavBtn.active");
+          ctrl.classList.contains("page-left")
+            ? (() => {
+                if (currentSlide.id === "slide-1") {
+                  return;
+                }
+                const prevSlide = currentSlide.previousElementSibling;
+                const prevNavBtn = currentNavBtn.previousElementSibling;
+                currentNavBtn.classList.remove("active");
+                currentSlide.classList.remove("active");
+                prevNavBtn.classList.add("active");
+                prevSlide.classList.add("active");
+              })()
+            : ctrl.classList.contains("page-right")
+            ? (() => {
+                if (currentSlide.id === "slide-3") {
+                  return;
+                }
+                const nextSlide = currentSlide.nextElementSibling;
+                const nextNavBtn = currentNavBtn.nextElementSibling;
+                currentNavBtn.classList.remove("active");
+                currentSlide.classList.remove("active");
+                nextNavBtn.classList.add("active");
+                nextSlide.classList.add("active");
+              })()
+            : () => {
+                currentSlide.classList.remove("active");
+                currentNavBtn.classList.remove("active");
+                slides.forEach((slide) => {
+                  if (slide.id === e.target.attributes.href.value.slice(1)) {
+                    e.target.classList.add("active");
+                    slide.classList.add("active");
+                  }
+                });
+              };
+        });
+      });
+
+      const slideDiv = document.querySelectorAll("[data-report=hourly]");
+      slideDiv.forEach((div) => {
+        if (div.id === "slide-1") {
+          slideArr[0].forEach((i) => {
+            const timeName = i.datetime.split(":").slice(0, 2).join(":");
+            let hourlyReport = createElem(
+              "div",
+              {
+                class: "forecast-hourly",
+                "data-hour": timeName,
+              },
+              {},
+              createElem("div", { class: "hour" }, {}, `${timeName}`),
+              createElem(
+                "div",
+                { class: "weather-data" },
+                {},
+                createElem(
+                  "h4",
+                  { class: "temp-high" },
+                  {},
+                  Math.round(i.temp),
+                  createElem("sup", {}, {}, "°C")
+                ),
+                createElem("img", { class: "condition", src: sunSVG }, {})
+              )
+            );
+            slideDiv[0].appendChild(hourlyReport);
+          });
+        }
+        if (div.id === "slide-2") {
+          slideArr[1].forEach((i) => {
+            const timeName = i.datetime.split(":").slice(0, 2).join(":");
+            let hourlyReport = createElem(
+              "div",
+              {
+                class: "forecast-hourly",
+                "data-hour": timeName,
+              },
+              {},
+              createElem("div", { class: "hour" }, {}, `${timeName}`),
+              createElem(
+                "div",
+                { class: "weather-data" },
+                {},
+                createElem(
+                  "h4",
+                  { class: "temp-high" },
+                  {},
+                  Math.round(i.temp),
+                  createElem("sup", {}, {}, "°C")
+                ),
+                createElem("img", { class: "condition", src: sunSVG }, {})
+              )
+            );
+            slideDiv[1].appendChild(hourlyReport);
+          });
+        }
+        if (div.id === "slide-3") {
+          slideArr[2].forEach((i) => {
+            const timeName = i.datetime.split(":").slice(0, 2).join(":");
+            let hourlyReport = createElem(
+              "div",
+              {
+                class: "forecast-hourly",
+                "data-hour": timeName,
+              },
+              {},
+              createElem("div", { class: "hour" }, {}, `${timeName}`),
+              createElem(
+                "div",
+                { class: "weather-data" },
+                {},
+                createElem(
+                  "h4",
+                  { class: "temp-high" },
+                  {},
+                  Math.round(i.temp),
+                  createElem("sup", {}, {}, "°C")
+                ),
+                createElem("img", { class: "condition", src: sunSVG }, {})
+              )
+            );
+            slideDiv[2].appendChild(hourlyReport);
+          });
+        }
+      });
+    }
     const weatherWarnings = createWeatherWarnings();
     mainContent.appendChild(weatherPrimaryInfo);
     weatherPrimaryInfo.appendChild(forecast);
-    const forecastDisplayReport = document.querySelector(
-      ".report-type_container"
-    );
-    forecastDisplayReport.appendChild(forecastDisplay);
+
+    // buildDailyForecast(queryData);
+    buildHourlyForecast(queryData);
+
     forecast.appendChild(weatherWarnings);
     weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
   } catch (error) {
@@ -298,24 +508,23 @@ const forecast = createElem(
         "div",
         { class: "controls-wrapper" },
         {},
-        createElem("img", { class: "page-left", src: leftArrowSVG }, {}),
-        createElem("div", { class: "dot active" }, {}),
-        createElem("div", { class: "dot" }, {}),
-        createElem("div", { class: "dot" }, {}),
-        createElem("img", { class: "page-right", src: rightArrowSVG }, {})
+        createElem(
+          "img",
+          { class: "controls page-left", src: leftArrowSVG },
+          {}
+        ),
+        createElem("a", { class: "controls slidernavBtn" }, {}),
+        createElem("a", { class: "controls slidernavBtn" }, {}),
+        createElem("a", { class: "controls slidernavBtn" }, {}),
+        createElem(
+          "img",
+          { class: " controls page-right", src: rightArrowSVG },
+          {}
+        )
       )
     )
   ),
-  createElem(
-    "div",
-    { class: "weather-report_container" },
-    {},
-    createElem(
-      "div",
-      { class: "report-type_container", "data-report": "daily" },
-      {}
-    )
-  )
+  createElem("div", { class: "weather-report_container" }, {})
 );
 
 const createWeatherSecondaryInfo = (queryData, windDirection) =>
@@ -427,58 +636,6 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
     )
   );
 
-const createForecastDisplay = (queryData) =>
-  // const search = document.querySelector("#search");
-  // search.value = "";
-  // console.log(cityName, queryData);
-  // console.log(queryData.days);
-
-  // let dailyArr = [...queryData.days.slice(1, 8)];
-  // console.log(dailyArr);
-
-  // const weekday = [
-  //   "SUNDAY",
-  //   "MONDAY",
-  //   "TUESDAY",
-  //   "WEDNESDAY",
-  //   "THURSDAY",
-  //   "FRIDAY",
-  //   "SATURDAY",
-  // ];
-
-  // dailyArr.forEach((i) => {
-  // const dayName = parseISO(i.datetime);
-  // let dailyReport =
-
-  createElem(
-    "div",
-    { class: "forecast-daily", "data-day": "date" },
-    {},
-    createElem("div", { class: "day" }, {}, `dayname`),
-    createElem(
-      "div",
-      { class: "weather-data" },
-      {},
-      createElem(
-        "h4",
-        { class: "temp-high" },
-        {},
-        `${Math.round(25.6)}`,
-        createElem("sup", {}, {}, "°C")
-      ),
-      createElem(
-        "h5",
-        { class: "temp-low" },
-        {},
-        `${Math.round(15.1)}`,
-        createElem("sup", {}, {}, "°C")
-      ),
-      createElem("img", { class: "condition", src: sunSVG }, {})
-    )
-  );
-// forecastDisplayReport.appendChild(dailyReport);
-// });
-
 const createWeatherWarnings = () =>
   createElem(
     "div",
@@ -502,18 +659,18 @@ const createWeatherWarnings = () =>
 
 //#region API call
 
-const location = document.querySelector(".location");
-const date = document.querySelector(".date");
-const time = document.querySelector(".time");
-const feelslike = document.querySelector(".feels-like");
-const humidity = document.querySelector(".humidity-index");
-const pop = document.querySelector(".pop");
-const windSpeed = document.querySelector(".wind-speed");
+// const location = document.querySelector(".location");
+// const date = document.querySelector(".date");
+// const time = document.querySelector(".time");
+// const feelslike = document.querySelector(".feels-like");
+// const humidity = document.querySelector(".humidity-index");
+// const pop = document.querySelector(".pop");
+// const windSpeed = document.querySelector(".wind-speed");
 // const windDirection = document.querySelector(".wind-direction");
-const temperature = document.querySelector(".temperature");
-const weatherCondition = document.querySelector(
-  ".weather-condition-description"
-);
+// const temperature = document.querySelector(".temperature");
+// const weatherCondition = document.querySelector(
+//   ".weather-condition-description"
+// );
 // const icon = document.querySelector(".weather-condition-icon");
 
 // async function getWeatherData() {
@@ -563,7 +720,7 @@ const weatherCondition = document.querySelector(
 //     ?.classList.remove("active");
 //   btn.classList.add("active");
 
-//   let forecastReport = document.querySelector(".report-type_container");
+//   let forecastReport = document.querySelector(".slide_container");
 //   forecastReport.dataset.report === "daily"
 //     ? forecastReport.appendChild(dailyReport) &&
 //       (controls.style.display = "none")

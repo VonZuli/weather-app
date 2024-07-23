@@ -390,7 +390,7 @@ sup.large {
   margin: 0 1em 0 0;
 }
 .controls-wrapper {
-  display: none;
+  display: flex;
   justify-content: flex-end;
   flex-basis: 100%;
   align-items: center;
@@ -406,7 +406,7 @@ sup.large {
   border-radius: 50%;
   scale: 1.1;
 }
-.dot {
+.slidernavBtn {
   border: 1px solid var(--active-btn);
   background-color: transparent;
   height: 0.5em;
@@ -414,10 +414,10 @@ sup.large {
   margin: 0.25em;
   cursor: pointer;
 }
-/* .dot:active {
+/* .slidernavBtn:active {
   background-color: var(--active-btn);
 } */
-.dot.active {
+.slidernavBtn.active {
   background-color: var(--active-btn);
 }
 .weather-report_container {
@@ -429,7 +429,7 @@ sup.large {
   flex-basis: 100%;
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
 }
-.report-type_container {
+.slide_container.active {
   display: flex;
   justify-content: space-around;
   flex-basis: 100%;
@@ -437,6 +437,9 @@ sup.large {
   font-size: 1.5em;
   padding: 0.5em;
   /* filter: drop-shadow(20px 10px 4px rgb(10, 3, 30)); */
+}
+.slide_container {
+  display: none;
 }
 .forecast-daily {
   display: flex;
@@ -461,6 +464,15 @@ sup.large {
   color: var(--alerts-color);
   min-width: 120px;
   font-family: "Road Rage";
+  font-weight: 100;
+}
+.hour {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--alerts-color);
+  min-width: 120px;
+  font-family: "Digital Alarm";
   font-weight: 100;
 }
 .weather-data {
