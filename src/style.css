@@ -228,6 +228,7 @@ input:checked + .slider:before {
   margin: 1em 0;
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
   border: 2px solid var(--border-color);
+  height: fit-content;
 }
 .primary-info_container > * {
   color: var(--text-color);
@@ -243,7 +244,6 @@ input:checked + .slider:before {
   margin: 1em;
   height: fit-content;
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
-  height: 95%;
   border: 2px solid var(--border-color);
 }
 
@@ -382,7 +382,7 @@ sup.large {
 .forecast-range-select > button.active {
   background-color: var(--active-btn);
 }
-.daily-pagination-controls {
+.pagination-controls {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -390,18 +390,16 @@ sup.large {
   margin: 0 1em 0 0;
 }
 .controls-wrapper {
-  display: none;
+  display: flex;
   justify-content: flex-end;
-  flex-basis: 100%;
   align-items: center;
-  /* max-width: 2em; */
 }
-.daily-pagination-controls > div > img {
+.pagination-controls > div > img {
   margin: 0.25em;
   width: 2em;
   cursor: pointer;
 }
-.daily-pagination-controls > div > img:hover {
+.pagination-controls > div > img:hover {
   background-color: var(--secondary-color);
   border-radius: 50%;
   scale: 1.1;
