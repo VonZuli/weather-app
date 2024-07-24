@@ -1,6 +1,6 @@
 import "./style.css";
 import { createElem } from "./scripts/factory";
-import { parseISO } from "date-fns";
+import { parse, parseISO, toDate } from "date-fns";
 
 export const imagepath = (name) => images(name, true);
 
@@ -457,14 +457,39 @@ function buildDailyForecast(queryData) {
 }
 
 function buildHourlyForecast(queryData) {
-  const now = new Date().toTimeString();
-  console.log(now);
+  const now = Math.floor(Date.now() / 1000);
+  const firstEpoch = queryData.days[0].hours[0].datetimeEpoch;
+  const days = queryData.days;
 
-  const hour = queryData.days[0].hours;
-  console.log(hour);
   const frame = document.querySelector(".weather-report_container");
-  const slideArr = [];
-  slideArr.push(hour.slice(0, 8), hour.slice(8, 16), hour.slice(16, 24));
+  const slideArr = [[], [], []];
+
+  const currentDayHours = days[0].hours.filter((hr) => now < hr.datetimeEpoch);
+  currentDayHours.forEach((hour, index) => {
+    if (index < 8) {
+      slideArr[0].push(hour);
+    } else if (index < 16) {
+      slideArr[1].push(hour);
+    } else {
+      slideArr[3].push(hour);
+    }
+  });
+
+  for (let day of days.slice(1)) {
+    if (now < day.datetimeEpoch) {
+      const nextDayHours = day.hours.filter((hr) => now < hr.datetimeEpoch);
+      nextDayHours.forEach((hour, index) => {
+        if (slideArr[0].length < 8) {
+          slideArr[0].push(hour);
+        } else if (slideArr[1].length < 8) {
+          slideArr[1].push(hour);
+        } else if (slideArr[2].length < 8) {
+          slideArr[2].push(hour);
+        }
+      });
+      break;
+    }
+  }
 
   const sliderNavBtn = document.querySelectorAll(".slidernavBtn");
   document.querySelector(".pagination-controls").appendChild(
@@ -503,6 +528,7 @@ function buildHourlyForecast(queryData) {
   sliderNavBtn.forEach((i, index) => {
     i.setAttribute("href", `#slide-${index + 1}`);
   });
+
   document.querySelector(".slide_container").classList.add("active");
   document.querySelector(".slidernavBtn").classList.add("active");
 
@@ -550,93 +576,65 @@ function buildHourlyForecast(queryData) {
   });
 
   const slideDiv = document.querySelectorAll("[data-report=hourly]");
-  slideDiv.forEach((div) => {
-    if (div.id === "slide-1") {
-      slideArr[0].forEach((i) => {
-        const timeName = i.datetime.split(":").slice(0, 2).join(":");
-        let hourlyReport = createElem(
+  slideDiv.forEach((div, slideIndex) => {
+    const slideData = slideArr[slideIndex];
+    slideData.forEach((i, index) => {
+      const timeName = i.datetime.split(":").slice(0, 2).join(":");
+      let hourlyReport = createElem(
+        "div",
+        {
+          class: "forecast-hourly",
+          "data-hour": timeName,
+        },
+        {},
+        createElem("div", { class: "hour" }, {}, `${timeName}`),
+        createElem(
           "div",
-          {
-            class: "forecast-hourly",
-            "data-hour": timeName,
-          },
+          { class: "weather-data" },
           {},
-          createElem("div", { class: "hour" }, {}, `${timeName}`),
           createElem(
-            "div",
-            { class: "weather-data" },
+            "h4",
+            { class: "temp-high" },
             {},
-            createElem(
-              "h4",
-              { class: "temp-high" },
-              {},
-              Math.round(i.temp),
-              createElem("sup", {}, {}, "°C")
-            ),
-            createElem("img", { class: "condition", src: sunSVG }, {})
-          )
-        );
-        slideDiv[0].appendChild(hourlyReport);
-      });
-    }
-    if (div.id === "slide-2") {
-      slideArr[1].forEach((i) => {
-        const timeName = i.datetime.split(":").slice(0, 2).join(":");
-        let hourlyReport = createElem(
-          "div",
-          {
-            class: "forecast-hourly",
-            "data-hour": timeName,
-          },
-          {},
-          createElem("div", { class: "hour" }, {}, `${timeName}`),
-          createElem(
+            Math.round(i.temp),
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem("img", { class: "condition", src: sunSVG }, {})
+        )
+      );
+      if (slideIndex === 0 && index === 0) {
+        const timeDiff = now - firstEpoch;
+        const currentHourIndex = Math.floor(timeDiff / 3600);
+        if (currentHourIndex < slideData.length) {
+          hourlyReport = createElem(
             "div",
-            { class: "weather-data" },
+            {
+              class: "forecast-hourly",
+              "data-hour": timeName,
+            },
             {},
+            createElem("div", { class: "hour" }, {}, `${timeName}`),
             createElem(
-              "h4",
-              { class: "temp-high" },
+              "div",
+              { class: "weather-data" },
               {},
-              Math.round(i.temp),
-              createElem("sup", {}, {}, "°C")
-            ),
-            createElem("img", { class: "condition", src: sunSVG }, {})
-          )
-        );
-        slideDiv[1].appendChild(hourlyReport);
-      });
-    }
-    if (div.id === "slide-3") {
-      slideArr[2].forEach((i) => {
-        const timeName = i.datetime.split(":").slice(0, 2).join(":");
-        let hourlyReport = createElem(
-          "div",
-          {
-            class: "forecast-hourly",
-            "data-hour": timeName,
-          },
-          {},
-          createElem("div", { class: "hour" }, {}, `${timeName}`),
-          createElem(
-            "div",
-            { class: "weather-data" },
-            {},
-            createElem(
-              "h4",
-              { class: "temp-high" },
-              {},
-              Math.round(i.temp),
-              createElem("sup", {}, {}, "°C")
-            ),
-            createElem("img", { class: "condition", src: sunSVG }, {})
-          )
-        );
-        slideDiv[2].appendChild(hourlyReport);
-      });
-    }
+              createElem(
+                "h4",
+                { class: "temp-high" },
+                {},
+                Math.round(slideData[currentHourIndex].temp),
+                createElem("sup", {}, {}, "°C")
+              ),
+              createElem("img", { class: "condition", src: sunSVG }, {})
+            )
+          );
+        }
+      }
+      div.appendChild(hourlyReport);
+    });
   });
 }
+//#endregion init
 const createWeatherWarnings = () =>
   createElem(
     "div",
@@ -671,312 +669,9 @@ function selectDisplay(btn, queryData) {
   }
   if (btn.id === "hourly") {
     weatherReportContainer.innerHTML = "";
-    // controls.style.display = "flex";
+
     buildHourlyForecast(queryData);
   }
   rangeBtn?.classList.remove("active");
   btn.classList.add("active");
 }
-//#endregion init
-
-//#region API call
-
-// const location = document.querySelector(".location");
-// const date = document.querySelector(".date");
-// const time = document.querySelector(".time");
-// const feelslike = document.querySelector(".feels-like");
-// const humidity = document.querySelector(".humidity-index");
-// const pop = document.querySelector(".pop");
-// const windSpeed = document.querySelector(".wind-speed");
-// const windDirection = document.querySelector(".wind-direction");
-// const temperature = document.querySelector(".temperature");
-// const weatherCondition = document.querySelector(
-//   ".weather-condition-description"
-// );
-// const icon = document.querySelector(".weather-condition-icon");
-
-// async function getWeatherData() {
-//   let keyword = search.value;
-//   const d = new Date();
-
-//   try {
-//     const response = await fetch(
-//       `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${keyword}?unitGroup=metric&key=5YWV9ZDBX4LKSZC48LHFQPNWH&contentType=json`,
-//       { mode: "cors" }
-//     );
-//     const weatherData = await response.json();
-
-//     location.textContent = weatherData.address;
-//     weatherCondition.textContent = weatherData.currentConditions.conditions;
-
-//     date.textContent = d.toDateString().split(" ").slice(1).join(" ");
-//     time.textContent = weatherData.currentConditions.datetime;
-//     temperature.textContent = `${Math.round(
-//       weatherData.currentConditions.temp
-//     )}`;
-
-//     feelslike.textContent = weatherData.currentConditions.feelslike;
-//     humidity.textContent = weatherData.currentConditions.humidity;
-//     pop.textContent = weatherData.currentConditions.precipprob;
-//     windSpeed.textContent = weatherData.currentConditions.windspeed;
-//     windDirection.textContent = weatherData.currentConditions.winddir;
-
-//     search.value = "";
-//     console.log(keyword, weatherData);
-//     console.log(weatherData.days);
-//   } catch (error) {
-//     console.error(`ERROR: ${error}`);
-//   }
-//   // setTimeout(() => {
-//   //   // console.log(weatherData);
-//   // }, 200);
-// }
-
-//#endregion API call
-
-// function selectDisplay(btn) {
-//   forecastDisplay.innerHTML = "";
-//   forecastDisplay.dataset.report = btn.id;
-//   document
-//     .querySelector(".range-select_btn.active")
-//     ?.classList.remove("active");
-//   btn.classList.add("active");
-
-//   let forecastReport = document.querySelector(".slide_container");
-//   forecastReport.dataset.report === "daily"
-//     ? forecastReport.appendChild(dailyReport) &&
-//       (controls.style.display = "none")
-//     : forecastReport.appendChild(hourlyReport) &&
-//       (controls.style.display = "flex");
-// }
-
-// let dailyReport = createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 0 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "SUNDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// );
-
-// let hourlyReport = createElem(
-//   "div",
-//   { class: "forecast-hourly", "data-hour": 0 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "6 AM"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// );
-// forecastDisplay.appendChild(dailyReport);
-
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 0 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "SUNDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// ),
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 1 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "MONDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// ),
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 2 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "TUESDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// ),
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 3 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "WEDNESDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// ),
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 4 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "THURSDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// ),
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 5 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "FRIDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// ),
-// createElem(
-//   "div",
-//   { class: "forecast-daily", "data-day": 6 },
-//   {},
-//   createElem("div", { class: "day" }, {}, "SATURDAY"),
-//   createElem(
-//     "div",
-//     { class: "weather-data" },
-//     {},
-//     createElem(
-//       "h4",
-//       { class: "temp-high" },
-//       {},
-//       25,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem(
-//       "h5",
-//       { class: "temp-low" },
-//       {},
-//       10,
-//       createElem("sup", {}, {}, "°C")
-//     ),
-//     createElem("img", { class: "condition", src: sunSVG }, {})
-//   )
-// )
