@@ -98,235 +98,23 @@ async function reverseGeo(position) {
     }
     const windDirection = getWindDirection(queryData.currentConditions.winddir);
     const weatherPrimaryInfo = createWeatherPrimaryInfo(cityName, queryData);
+    const forecast = createForecast(queryData);
     const weatherSecondaryInfo = createWeatherSecondaryInfo(
       queryData,
       windDirection
     );
 
-    function buildDailyForecast(queryData) {
-      const dailyArr = [...queryData.days.slice(1, 8)];
-      const weekday = [
-        "SUNDAY",
-        "MONDAY",
-        "TUESDAY",
-        "WEDNESDAY",
-        "THURSDAY",
-        "FRIDAY",
-        "SATURDAY",
-      ];
-      dailyArr.forEach((i) => {
-        const dayName = parseISO(i.datetime);
-
-        let dailyReport = createElem(
-          "div",
-          { class: "slide_container", "data-report": "daily" },
-          {},
-          createElem(
-            "div",
-            { class: "forecast-daily", "data-day": dayName.getDay() },
-            {},
-            createElem("div", { class: "day" }, {}, weekday[dayName.getDay()]),
-            createElem(
-              "div",
-              { class: "weather-data" },
-              {},
-              createElem(
-                "h4",
-                { class: "temp-high" },
-                {},
-                `${Math.round(i.tempmax)}`,
-                createElem("sup", {}, {}, "°C")
-              ),
-              createElem(
-                "h5",
-                { class: "temp-low" },
-                {},
-                `${Math.round(i.tempmin)}`,
-                createElem("sup", {}, {}, "°C")
-              ),
-              createElem("img", { class: "condition", src: sunSVG }, {})
-            )
-          )
-        );
-        document
-          .querySelector(".weather-report_container")
-          .appendChild(dailyReport);
-      });
-    }
-
-    function buildHourlyForecast(queryData) {
-      const hour = queryData.days[0].hours;
-      const forecastDisplayReport = document.querySelector(".slide_container");
-      const frame = document.querySelector(".weather-report_container");
-      const slideArr = [];
-      slideArr.push(hour.slice(0, 8), hour.slice(8, 16), hour.slice(16, 24));
-
-      const sliderNavBtn = document.querySelectorAll(".slidernavBtn");
-      slideArr.forEach((_, index) => {
-        const hourlyContainer = createElem(
-          "div",
-          {
-            class: "slide_container",
-            id: `slide-${index + 1}`,
-            "data-report": "hourly",
-          },
-          {}
-        );
-        frame.appendChild(hourlyContainer);
-      });
-
-      sliderNavBtn.forEach((i, index) => {
-        i.setAttribute("href", `#slide-${index + 1}`);
-      });
-      document.querySelector(".slide_container").classList.add("active");
-      document.querySelector(".slidernavBtn").classList.add("active");
-
-      const controls = document.querySelectorAll(".controls");
-      controls.forEach((ctrl) => {
-        ctrl.addEventListener("click", (e) => {
-          const slides = document.querySelectorAll(".slide_container");
-          const currentSlide = document.querySelector(
-            ".slide_container.active"
-          );
-          const currentNavBtn = document.querySelector(".slidernavBtn.active");
-          ctrl.classList.contains("page-left")
-            ? (() => {
-                if (currentSlide.id === "slide-1") {
-                  return;
-                }
-                const prevSlide = currentSlide.previousElementSibling;
-                const prevNavBtn = currentNavBtn.previousElementSibling;
-                currentNavBtn.classList.remove("active");
-                currentSlide.classList.remove("active");
-                prevNavBtn.classList.add("active");
-                prevSlide.classList.add("active");
-              })()
-            : ctrl.classList.contains("page-right")
-            ? (() => {
-                if (currentSlide.id === "slide-3") {
-                  return;
-                }
-                const nextSlide = currentSlide.nextElementSibling;
-                const nextNavBtn = currentNavBtn.nextElementSibling;
-                currentNavBtn.classList.remove("active");
-                currentSlide.classList.remove("active");
-                nextNavBtn.classList.add("active");
-                nextSlide.classList.add("active");
-              })()
-            : () => {
-                currentSlide.classList.remove("active");
-                currentNavBtn.classList.remove("active");
-                slides.forEach((slide) => {
-                  if (slide.id === e.target.attributes.href.value.slice(1)) {
-                    e.target.classList.add("active");
-                    slide.classList.add("active");
-                  }
-                });
-              };
-        });
-      });
-
-      const slideDiv = document.querySelectorAll("[data-report=hourly]");
-      slideDiv.forEach((div) => {
-        if (div.id === "slide-1") {
-          slideArr[0].forEach((i) => {
-            const timeName = i.datetime.split(":").slice(0, 2).join(":");
-            let hourlyReport = createElem(
-              "div",
-              {
-                class: "forecast-hourly",
-                "data-hour": timeName,
-              },
-              {},
-              createElem("div", { class: "hour" }, {}, `${timeName}`),
-              createElem(
-                "div",
-                { class: "weather-data" },
-                {},
-                createElem(
-                  "h4",
-                  { class: "temp-high" },
-                  {},
-                  Math.round(i.temp),
-                  createElem("sup", {}, {}, "°C")
-                ),
-                createElem("img", { class: "condition", src: sunSVG }, {})
-              )
-            );
-            slideDiv[0].appendChild(hourlyReport);
-          });
-        }
-        if (div.id === "slide-2") {
-          slideArr[1].forEach((i) => {
-            const timeName = i.datetime.split(":").slice(0, 2).join(":");
-            let hourlyReport = createElem(
-              "div",
-              {
-                class: "forecast-hourly",
-                "data-hour": timeName,
-              },
-              {},
-              createElem("div", { class: "hour" }, {}, `${timeName}`),
-              createElem(
-                "div",
-                { class: "weather-data" },
-                {},
-                createElem(
-                  "h4",
-                  { class: "temp-high" },
-                  {},
-                  Math.round(i.temp),
-                  createElem("sup", {}, {}, "°C")
-                ),
-                createElem("img", { class: "condition", src: sunSVG }, {})
-              )
-            );
-            slideDiv[1].appendChild(hourlyReport);
-          });
-        }
-        if (div.id === "slide-3") {
-          slideArr[2].forEach((i) => {
-            const timeName = i.datetime.split(":").slice(0, 2).join(":");
-            let hourlyReport = createElem(
-              "div",
-              {
-                class: "forecast-hourly",
-                "data-hour": timeName,
-              },
-              {},
-              createElem("div", { class: "hour" }, {}, `${timeName}`),
-              createElem(
-                "div",
-                { class: "weather-data" },
-                {},
-                createElem(
-                  "h4",
-                  { class: "temp-high" },
-                  {},
-                  Math.round(i.temp),
-                  createElem("sup", {}, {}, "°C")
-                ),
-                createElem("img", { class: "condition", src: sunSVG }, {})
-              )
-            );
-            slideDiv[2].appendChild(hourlyReport);
-          });
-        }
-      });
-    }
     const weatherWarnings = createWeatherWarnings();
     mainContent.appendChild(weatherPrimaryInfo);
     weatherPrimaryInfo.appendChild(forecast);
-
-    // buildDailyForecast(queryData);
-    buildHourlyForecast(queryData);
+    const weatherReportContainer = buildDailyForecast(queryData);
 
     forecast.appendChild(weatherWarnings);
     weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
   } catch (error) {
     console.error(`ERROR: ${error}`);
   }
-})();
+})(buildDailyForecast, buildHourlyForecast);
 
 //#region init
 const headerContainer = createElem(
@@ -465,67 +253,68 @@ const createWeatherPrimaryInfo = (cityName, queryData) =>
       )
     )
   );
-const forecast = createElem(
-  "div",
-  { class: "forecast_container" },
-  {},
+const createForecast = (queryData) =>
   createElem(
     "div",
-    { class: "forecast-controls" },
+    { class: "forecast_container" },
     {},
     createElem(
       "div",
-      { class: "forecast-range-select" },
-      {},
-      createElem(
-        "button",
-        { class: "range-select_btn active", id: "daily" },
-        {
-          click: (e) => {
-            e.preventDefault();
-            selectDisplay(e.target);
-          },
-        },
-        "DAILY"
-      ),
-      createElem(
-        "button",
-        { class: "range-select_btn", id: "hourly" },
-        {
-          click: (e) => {
-            e.preventDefault();
-            selectDisplay(e.target);
-          },
-        },
-        "HOURLY"
-      )
-    ),
-    createElem(
-      "div",
-      { class: "daily-pagination-controls" },
+      { class: "forecast-controls" },
       {},
       createElem(
         "div",
-        { class: "controls-wrapper" },
+        { class: "forecast-range-select" },
         {},
         createElem(
-          "img",
-          { class: "controls page-left", src: leftArrowSVG },
-          {}
+          "button",
+          { class: "range-select_btn active", id: "daily" },
+          {
+            click: (e) => {
+              e.preventDefault();
+              selectDisplay(e.target, queryData);
+            },
+          },
+          "DAILY"
         ),
-        createElem("a", { class: "controls slidernavBtn" }, {}),
-        createElem("a", { class: "controls slidernavBtn" }, {}),
-        createElem("a", { class: "controls slidernavBtn" }, {}),
         createElem(
-          "img",
-          { class: " controls page-right", src: rightArrowSVG },
-          {}
+          "button",
+          { class: "range-select_btn", id: "hourly" },
+          {
+            click: (e) => {
+              e.preventDefault();
+              selectDisplay(e.target, queryData);
+            },
+          },
+          "HOURLY"
+        )
+      ),
+      createElem(
+        "div",
+        { class: "daily-pagination-controls" },
+        {},
+        createElem(
+          "div",
+          { class: "controls-wrapper" },
+          {},
+          createElem(
+            "img",
+            { class: "controls page-left", src: leftArrowSVG },
+            {}
+          ),
+          createElem("a", { class: "controls slidernavBtn" }, {}),
+          createElem("a", { class: "controls slidernavBtn" }, {}),
+          createElem("a", { class: "controls slidernavBtn" }, {}),
+          createElem(
+            "img",
+            { class: " controls page-right", src: rightArrowSVG },
+            {}
+          )
         )
       )
-    )
-  ),
-  createElem("div", { class: "weather-report_container" }, {})
-);
+    ),
+    createElem("div", { class: "weather-report_container" }, {})
+  );
 
 const createWeatherSecondaryInfo = (queryData, windDirection) =>
   createElem(
@@ -635,7 +424,217 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
       createElem("img", { class: "outrunGIF", src: outrunGIF }, {})
     )
   );
+function buildDailyForecast(queryData) {
+  const dailyArr = [...queryData.days.slice(1, 8)];
+  const weekday = [
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+  ];
+  document
+    .querySelector(".weather-report_container")
+    .appendChild(
+      createElem(
+        "div",
+        { class: "slide_container active", "data-report": "daily" },
+        {}
+      )
+    );
 
+  dailyArr.forEach((i) => {
+    const dayName = parseISO(i.datetime);
+
+    let dailyReport = createElem(
+      "div",
+      { class: "forecast-daily", "data-day": dayName.getDay() },
+      {},
+      createElem("div", { class: "day" }, {}, weekday[dayName.getDay()]),
+      createElem(
+        "div",
+        { class: "weather-data" },
+        {},
+        createElem(
+          "h4",
+          { class: "temp-high" },
+          {},
+          `${Math.round(i.tempmax)}`,
+          createElem("sup", {}, {}, "°C")
+        ),
+        createElem(
+          "h5",
+          { class: "temp-low" },
+          {},
+          `${Math.round(i.tempmin)}`,
+          createElem("sup", {}, {}, "°C")
+        ),
+        createElem("img", { class: "condition", src: sunSVG }, {})
+      )
+    );
+    document.querySelector(".slide_container").appendChild(dailyReport);
+  });
+}
+
+function buildHourlyForecast(queryData) {
+  const hour = queryData.days[0].hours;
+  const frame = document.querySelector(".weather-report_container");
+  const slideArr = [];
+  slideArr.push(hour.slice(0, 8), hour.slice(8, 16), hour.slice(16, 24));
+
+  const sliderNavBtn = document.querySelectorAll(".slidernavBtn");
+  slideArr.forEach((_, index) => {
+    const hourlyContainer = createElem(
+      "div",
+      {
+        class: "slide_container",
+        id: `slide-${index + 1}`,
+        "data-report": "hourly",
+      },
+      {}
+    );
+    frame.appendChild(hourlyContainer);
+  });
+
+  sliderNavBtn.forEach((i, index) => {
+    i.setAttribute("href", `#slide-${index + 1}`);
+  });
+  document.querySelector(".slide_container").classList.add("active");
+  document.querySelector(".slidernavBtn").classList.add("active");
+
+  const controls = document.querySelectorAll(".controls");
+  controls.forEach((ctrl) => {
+    ctrl.addEventListener("click", (e) => {
+      const slides = document.querySelectorAll(".slide_container");
+      const currentSlide = document.querySelector(".slide_container.active");
+      const currentNavBtn = document.querySelector(".slidernavBtn.active");
+      ctrl.classList.contains("page-left")
+        ? (() => {
+            if (currentSlide.id === "slide-1") {
+              return;
+            }
+            const prevSlide = currentSlide.previousElementSibling;
+            const prevNavBtn = currentNavBtn.previousElementSibling;
+            currentNavBtn.classList.remove("active");
+            currentSlide.classList.remove("active");
+            prevNavBtn.classList.add("active");
+            prevSlide.classList.add("active");
+          })()
+        : ctrl.classList.contains("page-right")
+        ? (() => {
+            if (currentSlide.id === "slide-3") {
+              return;
+            }
+            const nextSlide = currentSlide.nextElementSibling;
+            const nextNavBtn = currentNavBtn.nextElementSibling;
+            currentNavBtn.classList.remove("active");
+            currentSlide.classList.remove("active");
+            nextNavBtn.classList.add("active");
+            nextSlide.classList.add("active");
+          })()
+        : () => {
+            currentSlide.classList.remove("active");
+            currentNavBtn.classList.remove("active");
+            slides.forEach((slide) => {
+              if (slide.id === e.target.attributes.href.value.slice(1)) {
+                e.target.classList.add("active");
+                slide.classList.add("active");
+              }
+            });
+          };
+    });
+  });
+
+  const slideDiv = document.querySelectorAll("[data-report=hourly]");
+  slideDiv.forEach((div) => {
+    if (div.id === "slide-1") {
+      slideArr[0].forEach((i) => {
+        const timeName = i.datetime.split(":").slice(0, 2).join(":");
+        let hourlyReport = createElem(
+          "div",
+          {
+            class: "forecast-hourly",
+            "data-hour": timeName,
+          },
+          {},
+          createElem("div", { class: "hour" }, {}, `${timeName}`),
+          createElem(
+            "div",
+            { class: "weather-data" },
+            {},
+            createElem(
+              "h4",
+              { class: "temp-high" },
+              {},
+              Math.round(i.temp),
+              createElem("sup", {}, {}, "°C")
+            ),
+            createElem("img", { class: "condition", src: sunSVG }, {})
+          )
+        );
+        slideDiv[0].appendChild(hourlyReport);
+      });
+    }
+    if (div.id === "slide-2") {
+      slideArr[1].forEach((i) => {
+        const timeName = i.datetime.split(":").slice(0, 2).join(":");
+        let hourlyReport = createElem(
+          "div",
+          {
+            class: "forecast-hourly",
+            "data-hour": timeName,
+          },
+          {},
+          createElem("div", { class: "hour" }, {}, `${timeName}`),
+          createElem(
+            "div",
+            { class: "weather-data" },
+            {},
+            createElem(
+              "h4",
+              { class: "temp-high" },
+              {},
+              Math.round(i.temp),
+              createElem("sup", {}, {}, "°C")
+            ),
+            createElem("img", { class: "condition", src: sunSVG }, {})
+          )
+        );
+        slideDiv[1].appendChild(hourlyReport);
+      });
+    }
+    if (div.id === "slide-3") {
+      slideArr[2].forEach((i) => {
+        const timeName = i.datetime.split(":").slice(0, 2).join(":");
+        let hourlyReport = createElem(
+          "div",
+          {
+            class: "forecast-hourly",
+            "data-hour": timeName,
+          },
+          {},
+          createElem("div", { class: "hour" }, {}, `${timeName}`),
+          createElem(
+            "div",
+            { class: "weather-data" },
+            {},
+            createElem(
+              "h4",
+              { class: "temp-high" },
+              {},
+              Math.round(i.temp),
+              createElem("sup", {}, {}, "°C")
+            ),
+            createElem("img", { class: "condition", src: sunSVG }, {})
+          )
+        );
+        slideDiv[2].appendChild(hourlyReport);
+      });
+    }
+  });
+}
 const createWeatherWarnings = () =>
   createElem(
     "div",
@@ -654,7 +653,25 @@ const createWeatherWarnings = () =>
       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
     )
   );
-
+function selectDisplay(btn, queryData) {
+  const rangeBtn = document.querySelector(".range-select_btn.active");
+  const controls = document.querySelector(".controls-wrapper");
+  const weatherReportContainer = document.querySelector(
+    ".weather-report_container"
+  );
+  if (btn.id === "daily") {
+    weatherReportContainer.innerHTML = "";
+    controls.style.display = "none";
+    buildDailyForecast(queryData);
+  }
+  if (btn.id === "hourly") {
+    weatherReportContainer.innerHTML = "";
+    controls.style.display = "flex";
+    buildHourlyForecast(queryData);
+  }
+  rangeBtn?.classList.remove("active");
+  btn.classList.add("active");
+}
 //#endregion init
 
 //#region API call
