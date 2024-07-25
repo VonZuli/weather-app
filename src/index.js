@@ -12,6 +12,7 @@ const leftArrowSVG = imagepath("./left-arrow.svg");
 const rightArrowSVG = imagepath("./right-arrow.svg");
 const outrunGIF = imagepath("./outrun.gif");
 
+const reportArr = [];
 //change to greeting with value based on ToD
 let greeting = "GOOD MORNING";
 
@@ -24,31 +25,9 @@ const getUserLocation = () => {
     }
   });
 };
-getUserLocation();
-const reportArr = [];
-
-async function initWeatherData(position) {
-  let keyword = `${position.coords.latitude}, ${position.coords.longitude}`;
-  try {
-    const response = await fetch(
-      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${keyword}?unitGroup=metric&key=5YWV9ZDBX4LKSZC48LHFQPNWH&contentType=json`,
-      { mode: "cors" }
-    );
-    const weatherData = await response.json();
-    const address = await reverseGeo(position);
-    const city = address.features[0].properties.city;
-
-    const reportQuery = { city, weatherData };
-
-    reportArr.push(reportQuery);
-
-    return reportArr;
-  } catch (error) {
-    console.error(`ERROR: ${error}`);
-  }
-}
 
 async function reverseGeo(position) {
+  console.log(position);
   let requestOptions = {
     method: "GET",
   };
@@ -63,13 +42,32 @@ async function reverseGeo(position) {
   }
 }
 
-(async () => {
+async function initWeatherData(keyword) {
+  console.log(keyword);
   try {
-    const position = await getUserLocation();
-    const populatedReportArr = await initWeatherData(position);
+    const response = await fetch(
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${keyword}?unitGroup=metric&key=5YWV9ZDBX4LKSZC48LHFQPNWH&contentType=json`,
+      { mode: "cors" }
+    );
+    const weatherData = await response.json();
+    let city = keyword;
+    if (!isNaN(parseFloat(keyword.split(",")[0]))) {
+      const position = {
+        coords: {
+          latitude: parseFloat(keyword.split(",")[0]),
+          longitude: parseFloat(keyword.split(",")[1]),
+        },
+      };
+      const address = await reverseGeo(position);
+      city = address.features[0].properties.city;
+    }
 
-    const cityName = populatedReportArr[0].city;
-    const queryData = populatedReportArr[0].weatherData;
+    const reportQuery = { city, weatherData };
+    reportArr.push(reportQuery);
+
+    const cityName = reportQuery.city;
+    const queryData = reportQuery.weatherData;
+
     function getWindDirection(winddir) {
       if (winddir === 0 || winddir === 360) {
         return "N ⬆";
@@ -103,85 +101,104 @@ async function reverseGeo(position) {
       queryData,
       windDirection
     );
-
     const weatherWarnings = createWeatherWarnings();
+    mainContent.innerHTML = "";
+
+    const headerContainer = createHeaderContainer();
+    mainContent.appendChild(headerContainer);
     mainContent.appendChild(weatherPrimaryInfo);
     weatherPrimaryInfo.appendChild(forecast);
     buildDailyForecast(queryData);
 
     forecast.appendChild(weatherWarnings);
     weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
+
+    return reportArr;
   } catch (error) {
     console.error(`ERROR: ${error}`);
   }
-})(buildDailyForecast, buildHourlyForecast);
+}
+
+(async () => {
+  try {
+    const position = await getUserLocation();
+    const keyword = `${position.coords.latitude}, ${position.coords.longitude}`;
+    await initWeatherData(keyword);
+  } catch (error) {
+    console.error(`ERROR: ${error}`);
+  }
+})();
 
 //#region init
-const headerContainer = createElem(
-  "div",
-  { class: "header" },
-  {},
-  createElem(
+const createHeaderContainer = () => {
+  const headerContainer = createElem(
     "div",
-    { class: "header_container" },
+    { class: "header" },
     {},
-    createElem("h2", { class: "greeting" }, {}, "HELLO THERE, "),
-    createElem("span", { class: "tod-greeting" }, {}, `${greeting}`)
-  ),
-  createElem(
-    "div",
-    { class: "search-bar_container" },
-    {},
-    createElem(
-      "form",
-      { class: "location-form" },
-      {
-        submit: (e) => {
-          e.preventDefault();
-          getWeatherData();
-        },
-      },
-      createElem(
-        "input",
-        {
-          id: "search",
-          class: "location-search_input",
-          placeholder: "Search Location...",
-        },
-        {}
-      ),
-      createElem(
-        "button",
-        { class: "search_btn", type: "submit", form: "search" },
-        {},
-        // { click: getWeatherData },
-        "SEARCH"
-      )
-    )
-  ),
-  createElem(
-    "div",
-    { class: "unit-toggle_container" },
-    {},
-    createElem("h3", { class: "unit-title" }, {}, "SELECT UNITS"),
     createElem(
       "div",
-      { class: "unit-toggle_wrapper" },
+      { class: "header_container" },
       {},
-      createElem("p", { class: "celsius" }, {}, "°C"),
+      createElem("h2", { class: "greeting" }, {}, "HELLO THERE, "),
+      createElem("span", { class: "tod-greeting" }, {}, `${greeting}`)
+    ),
+    createElem(
+      "div",
+      { class: "search-bar_container" },
+      {},
       createElem(
-        "label",
-        { class: "switch" },
+        "form",
+        { class: "location-form" },
+        {
+          submit: (e) => {
+            e.preventDefault();
+            const search = document.querySelector("#search");
+            const searchValue = search.value.trim();
+            if (searchValue) {
+              initWeatherData(searchValue);
+            }
+          },
+        },
+        createElem(
+          "input",
+          {
+            id: "search",
+            class: "location-search_input",
+            placeholder: "Search Location...",
+          },
+          {}
+        ),
+        createElem(
+          "button",
+          { class: "search_btn", type: "submit", form: "search" },
+          {},
+          "SEARCH"
+        )
+      )
+    ),
+    createElem(
+      "div",
+      { class: "unit-toggle_container" },
+      {},
+      createElem("h3", { class: "unit-title" }, {}, "SELECT UNITS"),
+      createElem(
+        "div",
+        { class: "unit-toggle_wrapper" },
         {},
-        createElem("input", { class: "unit-toggle", type: "checkbox" }, {}),
-        createElem("span", { class: "slider" }, {})
-      ),
-      createElem("p", { class: "fahrenheit" }, {}, "°F")
+        createElem("p", { class: "celsius" }, {}, "°C"),
+        createElem(
+          "label",
+          { class: "switch" },
+          {},
+          createElem("input", { class: "unit-toggle", type: "checkbox" }, {}),
+          createElem("span", { class: "slider" }, {})
+        ),
+        createElem("p", { class: "fahrenheit" }, {}, "°F")
+      )
     )
-  )
-);
-mainContent.appendChild(headerContainer);
-
+  );
+  return headerContainer;
+};
 const createWeatherPrimaryInfo = (cityName, queryData) =>
   createElem(
     "div",
@@ -402,6 +419,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
       createElem("img", { class: "outrunGIF", src: outrunGIF }, {})
     )
   );
+
 function buildDailyForecast(queryData) {
   const dailyArr = [...queryData.days.slice(1, 8)];
   const weekday = [
@@ -653,6 +671,7 @@ const createWeatherWarnings = () =>
       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
     )
   );
+
 function selectDisplay(btn, queryData) {
   const rangeBtn = document.querySelector(".range-select_btn.active");
   const controls = document.querySelector(".controls-wrapper");
