@@ -12,7 +12,6 @@ const leftArrowSVG = imagepath("./left-arrow.svg");
 const rightArrowSVG = imagepath("./right-arrow.svg");
 const outrunGIF = imagepath("./outrun.gif");
 
-const reportArr = [];
 //change to greeting with value based on ToD
 let greeting = "GOOD MORNING";
 
@@ -27,7 +26,6 @@ const getUserLocation = () => {
 };
 
 async function reverseGeo(position) {
-  console.log(position);
   let requestOptions = {
     method: "GET",
   };
@@ -43,7 +41,6 @@ async function reverseGeo(position) {
 }
 
 async function initWeatherData(keyword) {
-  console.log(keyword);
   try {
     const response = await fetch(
       `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${keyword}?unitGroup=metric&key=5YWV9ZDBX4LKSZC48LHFQPNWH&contentType=json`,
@@ -63,7 +60,6 @@ async function initWeatherData(keyword) {
     }
 
     const reportQuery = { city, weatherData };
-    reportArr.push(reportQuery);
 
     const cityName = reportQuery.city;
     const queryData = reportQuery.weatherData;
@@ -112,8 +108,6 @@ async function initWeatherData(keyword) {
 
     forecast.appendChild(weatherWarnings);
     weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
-
-    return reportArr;
   } catch (error) {
     console.error(`ERROR: ${error}`);
   }
@@ -171,7 +165,16 @@ const createHeaderContainer = () => {
         createElem(
           "button",
           { class: "search_btn", type: "submit", form: "search" },
-          {},
+          {
+            click: (e) => {
+              e.preventDefault();
+              const search = document.querySelector("#search");
+              const searchValue = search.value.trim();
+              if (searchValue) {
+                initWeatherData(searchValue);
+              }
+            },
+          },
           "SEARCH"
         )
       )
@@ -190,7 +193,29 @@ const createHeaderContainer = () => {
           "label",
           { class: "switch" },
           {},
-          createElem("input", { class: "unit-toggle", type: "checkbox" }, {}),
+          createElem(
+            "input",
+            { class: "unit-toggle", type: "checkbox" },
+            {
+              change: (e) => {
+                e.preventDefault();
+                const toggle = e.target;
+                const tempElements = document.querySelectorAll(".temp");
+                tempElements.forEach((tempEl) => {
+                  const currentTemp = parseFloat(tempEl.textContent);
+                  const convertedTemp = convertTemp(toggle, currentTemp);
+                  tempEl.textContent = Math.round(convertedTemp);
+                  const supEl = createElem(
+                    "sup",
+                    {},
+                    {},
+                    toggle.checked ? "°F" : "°C"
+                  );
+                  tempEl.appendChild(supEl);
+                });
+              },
+            }
+          ),
           createElem("span", { class: "slider" }, {})
         ),
         createElem("p", { class: "fahrenheit" }, {}, "°F")
@@ -253,7 +278,7 @@ const createWeatherPrimaryInfo = (cityName, queryData) =>
             ),
             createElem(
               "h1",
-              { class: "temperature" },
+              { class: "temperature temp" },
               {},
               `${Math.round(queryData.currentConditions.temp)}`,
               createElem("sup", { class: "large" }, {}, "°C")
@@ -332,7 +357,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
           createElem("h3", { class: "secondary-content " }, {}, "FEELS LIKE"),
           createElem(
             "h3",
-            { class: "feels-like" },
+            { class: "feels-like temp" },
             {},
             queryData.currentConditions.feelslike,
             createElem("sup", {}, {}, "°C")
@@ -455,14 +480,14 @@ function buildDailyForecast(queryData) {
         {},
         createElem(
           "h4",
-          { class: "temp-high" },
+          { class: "temp-high temp" },
           {},
           `${Math.round(i.tempmax)}`,
           createElem("sup", {}, {}, "°C")
         ),
         createElem(
           "h5",
-          { class: "temp-low" },
+          { class: "temp-low temp" },
           {},
           `${Math.round(i.tempmin)}`,
           createElem("sup", {}, {}, "°C")
@@ -612,7 +637,7 @@ function buildHourlyForecast(queryData) {
           {},
           createElem(
             "h4",
-            { class: "temp-high" },
+            { class: "temp-high temp" },
             {},
             Math.round(i.temp),
             createElem("sup", {}, {}, "°C")
@@ -623,6 +648,7 @@ function buildHourlyForecast(queryData) {
       if (slideIndex === 0 && index === 0) {
         const timeDiff = now - firstEpoch;
         const currentHourIndex = Math.floor(timeDiff / 3600);
+
         if (currentHourIndex < slideData.length) {
           hourlyReport = createElem(
             "div",
@@ -638,7 +664,7 @@ function buildHourlyForecast(queryData) {
               {},
               createElem(
                 "h4",
-                { class: "temp-high" },
+                { class: "temp-high temp" },
                 {},
                 Math.round(slideData[currentHourIndex].temp),
                 createElem("sup", {}, {}, "°C")
@@ -656,19 +682,36 @@ function buildHourlyForecast(queryData) {
 const createWeatherWarnings = () =>
   createElem(
     "div",
-    { class: "extreme-weather_container" },
+    { class: "weather-alerts_container" },
     {},
     createElem(
-      "h2",
-      { class: "extreme-weather-title" },
+      "div",
+      { class: "weather-desc_container" },
       {},
-      "Extreme Weather Alerts"
+      createElem("h2", { class: "weather-desc-title" }, {}, "Description"),
+      createElem(
+        "p",
+        { class: "weather-desc_content" },
+        {},
+        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
+      )
     ),
     createElem(
-      "p",
-      { class: "extreme-weather-content" },
+      "div",
+      { class: "extreme-weather_container" },
       {},
-      "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
+      createElem(
+        "h2",
+        { class: "extreme-weather-title" },
+        {},
+        "Extreme Weather Alerts"
+      ),
+      createElem(
+        "p",
+        { class: "extreme-weather-content" },
+        {},
+        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
+      )
     )
   );
 
@@ -694,3 +737,16 @@ function selectDisplay(btn, queryData) {
   rangeBtn?.classList.remove("active");
   btn.classList.add("active");
 }
+
+const convertTemp = (toggle, temp) => {
+  let convertedTemp;
+  if (toggle.checked) {
+    //℃ to ℉
+    convertedTemp = (temp * 9) / 5 + 32;
+  }
+  if (!toggle.checked) {
+    //℉ to ℃
+    convertedTemp = ((temp - 32) * 5) / 9;
+  }
+  return convertedTemp;
+};

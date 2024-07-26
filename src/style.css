@@ -9,6 +9,7 @@
 :root {
   --primary-color: rgb(22, 7, 64);
   --secondary-color: rgb(30, 10, 80);
+  --secondary-color-alpha: rgb(30, 10, 80, 0.6);
   --text-color: rgb(255, 255, 255);
   --accent-text: rgb(68, 182, 250);
   --secondary-accent: rgb(255, 165, 0);
@@ -44,6 +45,11 @@ body {
   height: 100%;
   background-color: var(--primary-color);
   align-items: center;
+  background-image: url("./assets/images/vector-grid.png");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 99.99%;
+  object-fit: cover;
 }
 
 .main-content {
@@ -226,8 +232,8 @@ input:checked + .slider:before {
   flex-direction: row;
   justify-content: space-between;
   margin: 1em 0;
-  box-shadow: 5px 5px 5px 5px var(--box-shadow);
-  border: 2px solid var(--border-color);
+  /* box-shadow: 5px 5px 5px 5px var(--box-shadow); */
+  /* border: 2px solid var(--border-color); */
   height: fit-content;
 }
 .primary-info_container > * {
@@ -255,7 +261,7 @@ input:checked + .slider:before {
   align-content: center;
   height: fit-content;
   padding: 0.5em;
-  background-color: (--secondary-color);
+  background-color: var(--secondary-color-alpha);
 }
 .general-top_wrapper {
   display: flex;
@@ -272,8 +278,11 @@ input:checked + .slider:before {
   font-weight: 100;
   font-size: 4em;
   padding: 5px;
+  width: 100%;
+  text-align: center;
   flex-basis: 100%;
   height: 200px;
+  background-color: var(--primary-color);
 }
 .weather-condition-icon {
   width: 20em;
@@ -434,6 +443,7 @@ sup.large {
   align-items: center;
   font-size: 1.5em;
   padding: 0.5em;
+  background-color: var(--secondary-color-alpha);
   /* filter: drop-shadow(20px 10px 4px rgb(10, 3, 30)); */
 }
 .slide_container {
@@ -508,10 +518,11 @@ sup {
   display: flex;
   flex-direction: column;
   flex-basis: 20%;
+  max-width: 300px;
   margin: 1em;
   border: 2px solid var(--border-color);
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
-
+  background-color: var(--secondary-color-alpha);
   height: fit-content;
 }
 .secondary-weather_container {
@@ -559,11 +570,16 @@ sup {
 }
 .gif-container > img {
   max-width: 100%;
-  filter: opacity(25%) saturate(5);
+  filter: opacity(35%) saturate(5);
 }
 /*#endregion secondary*/
 
 /*#region alerts*/
+.weather-alerts_container {
+  display: flex;
+  flex-direction: row;
+}
+.weather-desc_container,
 .extreme-weather_container {
   display: flex;
   flex-direction: column;
@@ -572,7 +588,9 @@ sup {
   align-items: center;
   border: 2px solid var(--border-color);
   box-shadow: 5px 5px 5px 5px var(--box-shadow);
+  background-color: var(--secondary-color-alpha);
 }
+.weather-desc_container > h2,
 .extreme-weather_container > h2 {
   font-family: "Road Rage";
   font-size: 2em;
@@ -582,6 +600,7 @@ sup {
   color: var(--alerts-color);
   margin: 0.5em;
 }
+.weather-desc_container > p,
 .extreme-weather_container > p {
   align-items: center;
   align-content: center;
