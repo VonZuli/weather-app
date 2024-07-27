@@ -8,8 +8,20 @@ const mainContent = document.querySelector(".main-content");
 const images = require.context("../src/assets/images", true);
 
 const sunSVG = imagepath("./retrowave_sunset.svg");
+const cloudSVG = imagepath("./retrowave_cloud.svg");
+const fogSVG = imagepath("./retrowave_fog.svg");
+const rainSVG = imagepath("./retrowave_rain.svg");
+const snowSVG = imagepath("./retrowave_snow.svg");
+const stormSVG = imagepath("./retrowave_storm.svg");
+const sunCloudSVG = imagepath("./retrowave_sun-cloud.svg");
+const sunShowersSVG = imagepath("./retrowave_sun-showers.svg");
 const leftArrowSVG = imagepath("./left-arrow.svg");
 const rightArrowSVG = imagepath("./right-arrow.svg");
+const compassSVG = imagepath("./compass.svg");
+const speedSVG = imagepath("./speed.svg");
+const humiditySVG = imagepath("./humidity.svg");
+const umbrellaSVG = imagepath("./umbrella.svg");
+const tempSVG = imagepath("./temp_half.svg");
 const outrunGIF = imagepath("./outrun.gif");
 
 //change to greeting with value based on ToD
@@ -90,8 +102,51 @@ async function initWeatherData(keyword) {
         return "NW ↖";
       }
     }
+    function getWeatherCondition(currentCondition) {
+      if (
+        currentCondition === "clear-day" ||
+        currentCondition === "clear-night"
+      ) {
+        return sunSVG;
+      }
+      if (
+        currentCondition === "partly-cloudy-day" ||
+        currentCondition === "partly-cloudy-night"
+      ) {
+        return sunCloudSVG;
+      }
+      if (currentCondition === "cloudy") {
+        return cloudSVG;
+      }
+      if (currentCondition === "fog") {
+        return fogSVG;
+      }
+      if (currentCondition === "rain") {
+        return rainSVG;
+      }
+      if (currentCondition === "snow") {
+        return snowSVG;
+      }
+      if (
+        currentCondition === "thunder-rain" ||
+        currentCondition === "thunder- showers-day" ||
+        currentCondition === "thunder-showers-night"
+      ) {
+        return stormSVG;
+      }
+      console.log(current);
+    }
+
+    const weatherConditions = getWeatherCondition(
+      queryData.currentConditions.icon
+    );
+
     const windDirection = getWindDirection(queryData.currentConditions.winddir);
-    const weatherPrimaryInfo = createWeatherPrimaryInfo(cityName, queryData);
+    const weatherPrimaryInfo = createWeatherPrimaryInfo(
+      cityName,
+      queryData,
+      weatherConditions
+    );
     const forecast = createForecast(queryData);
     const weatherSecondaryInfo = createWeatherSecondaryInfo(
       queryData,
@@ -224,7 +279,7 @@ const createHeaderContainer = () => {
   );
   return headerContainer;
 };
-const createWeatherPrimaryInfo = (cityName, queryData) =>
+const createWeatherPrimaryInfo = (cityName, queryData, weatherConditions) =>
   createElem(
     "div",
     { class: "primary-info_container" },
@@ -244,7 +299,7 @@ const createWeatherPrimaryInfo = (cityName, queryData) =>
           createElem("h2", { class: "location" }, {}, cityName),
           createElem(
             "img",
-            { class: "weather-condition-icon", src: sunSVG },
+            { class: "weather-condition-icon", src: weatherConditions },
             {}
           )
         ),
@@ -349,7 +404,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
         "div",
         { class: "secondary-info-flex-wrapper" },
         {},
-        createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+        createElem("img", { class: "secondary-svg", src: tempSVG }, {}),
         createElem(
           "div",
           { class: "secondary-content-wrapper" },
@@ -368,7 +423,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
         "div",
         { class: "secondary-info-flex-wrapper" },
         {},
-        createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+        createElem("img", { class: "secondary-svg", src: humiditySVG }, {}),
         createElem(
           "div",
           { class: "secondary-content-wrapper" },
@@ -386,7 +441,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
         "div",
         { class: "secondary-info-flex-wrapper" },
         {},
-        createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+        createElem("img", { class: "secondary-svg", src: umbrellaSVG }, {}),
         createElem(
           "div",
           { class: "secondary-content-wrapper" },
@@ -404,7 +459,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
         "div",
         { class: "secondary-info-flex-wrapper" },
         {},
-        createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+        createElem("img", { class: "secondary-svg", src: speedSVG }, {}),
         createElem(
           "div",
           { class: "secondary-content-wrapper" },
@@ -422,7 +477,7 @@ const createWeatherSecondaryInfo = (queryData, windDirection) =>
         "div",
         { class: "secondary-info-flex-wrapper" },
         {},
-        createElem("img", { class: "secondary-svg", src: sunSVG }, {}),
+        createElem("img", { class: "secondary-svg", src: compassSVG }, {}),
         createElem(
           "div",
           { class: "secondary-content-wrapper" },
@@ -468,7 +523,6 @@ function buildDailyForecast(queryData) {
 
   dailyArr.forEach((i) => {
     const dayName = parseISO(i.datetime);
-
     let dailyReport = createElem(
       "div",
       { class: "forecast-daily", "data-day": dayName.getDay() },
@@ -492,7 +546,11 @@ function buildDailyForecast(queryData) {
           `${Math.round(i.tempmin)}`,
           createElem("sup", {}, {}, "°C")
         ),
-        createElem("img", { class: "condition", src: sunSVG }, {})
+        createElem(
+          "img",
+          { class: "condition", src: getForecastCondition(i.icon) },
+          {}
+        )
       )
     );
     document.querySelector(".slide_container").appendChild(dailyReport);
@@ -503,7 +561,7 @@ function buildHourlyForecast(queryData) {
   const now = Math.floor(Date.now() / 1000);
   const firstEpoch = queryData.days[0].hours[0].datetimeEpoch;
   const days = queryData.days;
-
+  console.log(queryData);
   const frame = document.querySelector(".weather-report_container");
   const slideArr = [[], [], []];
 
@@ -642,7 +700,11 @@ function buildHourlyForecast(queryData) {
             Math.round(i.temp),
             createElem("sup", {}, {}, "°C")
           ),
-          createElem("img", { class: "condition", src: sunSVG }, {})
+          createElem(
+            "img",
+            { class: "condition", src: getForecastCondition(i.icon) },
+            {}
+          )
         )
       );
       if (slideIndex === 0 && index === 0) {
@@ -669,7 +731,11 @@ function buildHourlyForecast(queryData) {
                 Math.round(slideData[currentHourIndex].temp),
                 createElem("sup", {}, {}, "°C")
               ),
-              createElem("img", { class: "condition", src: sunSVG }, {})
+              createElem(
+                "img",
+                { class: "condition", src: getForecastCondition(i.icon) },
+                {}
+              )
             )
           );
         }
@@ -731,7 +797,6 @@ function selectDisplay(btn, queryData) {
   }
   if (btn.id === "hourly") {
     weatherReportContainer.innerHTML = "";
-
     buildHourlyForecast(queryData);
   }
   rangeBtn?.classList.remove("active");
@@ -750,3 +815,31 @@ const convertTemp = (toggle, temp) => {
   }
   return convertedTemp;
 };
+
+function getForecastCondition(icon) {
+  if (icon === "clear-day" || icon === "clear-night") {
+    return sunSVG;
+  }
+  if (icon === "partly-cloudy-day" || icon === "partly-cloudy-night") {
+    return sunCloudSVG;
+  }
+  if (icon === "cloudy") {
+    return cloudSVG;
+  }
+  if (icon === "fog") {
+    return fogSVG;
+  }
+  if (icon === "rain") {
+    return rainSVG;
+  }
+  if (icon === "snow") {
+    return snowSVG;
+  }
+  if (
+    icon === "thunder-rain" ||
+    icon === "thunder- showers-day" ||
+    icon === "thunder-showers-night"
+  ) {
+    return stormSVG;
+  }
+}
