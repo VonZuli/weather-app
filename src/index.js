@@ -25,8 +25,23 @@ const tempSVG = imagepath("./temp_half.svg");
 const outrunGIF = imagepath("./outrun.gif");
 
 //change to greeting with value based on ToD
-let greeting = "GOOD MORNING";
-
+let greeting = () => {
+  let date = new Date().toString();
+  let currentTime = +date.split(" ").slice(4, 5)[0].split(":")[0];
+  if (currentTime >= 3 && currentTime < 12) {
+    return "Good Morning";
+  }
+  if (currentTime >= 12 && currentTime < 17) {
+    return "Good Afternoon";
+  }
+  if (currentTime >= 17 && currentTime < 23) {
+    return "Good Evening";
+  }
+  if (currentTime >= 0 && currentTime < 3) {
+    return "Burning the midnight oil.";
+  }
+};
+greeting();
 const getUserLocation = () => {
   return new Promise((resolve, reject) => {
     if (navigator.geolocation) {
@@ -152,7 +167,7 @@ async function initWeatherData(keyword) {
       queryData,
       windDirection
     );
-    const weatherWarnings = createWeatherWarnings();
+    const weatherAlerts = createWeatherAlerts(queryData);
     mainContent.innerHTML = "";
 
     const headerContainer = createHeaderContainer();
@@ -161,9 +176,10 @@ async function initWeatherData(keyword) {
     weatherPrimaryInfo.appendChild(forecast);
     buildDailyForecast(queryData);
 
-    forecast.appendChild(weatherWarnings);
+    forecast.appendChild(weatherAlerts);
     weatherPrimaryInfo.appendChild(weatherSecondaryInfo);
   } catch (error) {
+    document.querySelector(".search-error").style.display = "block";
     console.error(`ERROR: ${error}`);
   }
 }
@@ -186,10 +202,10 @@ const createHeaderContainer = () => {
     {},
     createElem(
       "div",
-      { class: "header_container" },
+      { class: "greeting_container" },
       {},
       createElem("h2", { class: "greeting" }, {}, "HELLO THERE, "),
-      createElem("span", { class: "tod-greeting" }, {}, `${greeting}`)
+      createElem("span", { class: "tod-greeting" }, {}, `${greeting()}`)
     ),
     createElem(
       "div",
@@ -232,7 +248,8 @@ const createHeaderContainer = () => {
           },
           "SEARCH"
         )
-      )
+      ),
+      createElem("p", { class: "search-error" }, {}, "Location not found.")
     ),
     createElem(
       "div",
@@ -533,18 +550,23 @@ function buildDailyForecast(queryData) {
         { class: "weather-data" },
         {},
         createElem(
-          "h4",
-          { class: "temp-high temp" },
+          "div",
+          { class: "temp-container" },
           {},
-          `${Math.round(i.tempmax)}`,
-          createElem("sup", {}, {}, "°C")
-        ),
-        createElem(
-          "h5",
-          { class: "temp-low temp" },
-          {},
-          `${Math.round(i.tempmin)}`,
-          createElem("sup", {}, {}, "°C")
+          createElem(
+            "h4",
+            { class: "temp-high temp" },
+            {},
+            `${Math.round(i.tempmax)}`,
+            createElem("sup", {}, {}, "°C")
+          ),
+          createElem(
+            "h5",
+            { class: "temp-low temp" },
+            {},
+            `${Math.round(i.tempmin)}`,
+            createElem("sup", {}, {}, "°C")
+          )
         ),
         createElem(
           "img",
@@ -745,7 +767,7 @@ function buildHourlyForecast(queryData) {
   });
 }
 //#endregion init
-const createWeatherWarnings = () =>
+const createWeatherAlerts = (queryData) =>
   createElem(
     "div",
     { class: "weather-alerts_container" },
@@ -759,7 +781,7 @@ const createWeatherWarnings = () =>
         "p",
         { class: "weather-desc_content" },
         {},
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
+        queryData.description
       )
     ),
     createElem(
@@ -776,7 +798,11 @@ const createWeatherWarnings = () =>
         "p",
         { class: "extreme-weather-content" },
         {},
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt tempora consequuntur deleniti autem, repudiandae quaerat, delectus dolorem ab soluta repellendus, nemo tenetur dignissimos quis harum. Atque saepe iste consectetur error."
+        queryData.alerts.length === 0
+          ? "No alerts to display."
+          : queryData.alerts.forEach((alert) => {
+              alert;
+            })
       )
     )
   );
