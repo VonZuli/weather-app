@@ -615,6 +615,7 @@ sup {
   font-family: "VCR Mono";
   font-weight: 100;
   width: 75%;
+  line-height: 20px;
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -648,7 +649,7 @@ input:-webkit-autofill:active {
   }
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1050px) {
   .header {
     flex-wrap: wrap;
     justify-content: center;

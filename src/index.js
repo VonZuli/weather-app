@@ -296,6 +296,7 @@ const createHeaderContainer = () => {
   );
   return headerContainer;
 };
+
 const createWeatherPrimaryInfo = (cityName, queryData, weatherConditions) =>
   createElem(
     "div",
@@ -583,7 +584,6 @@ function buildHourlyForecast(queryData) {
   const now = Math.floor(Date.now() / 1000);
   const firstEpoch = queryData.days[0].hours[0].datetimeEpoch;
   const days = queryData.days;
-  console.log(queryData);
   const frame = document.querySelector(".weather-report_container");
   const slideArr = [[], [], []];
 
@@ -767,8 +767,30 @@ function buildHourlyForecast(queryData) {
   });
 }
 //#endregion init
-const createWeatherAlerts = (queryData) =>
-  createElem(
+const createWeatherAlerts = (queryData) => {
+  const alertsContent =
+    queryData.alerts.length === 0
+      ? "No alerts to display."
+      : queryData.alerts
+          .map((alert) => {
+            console.log(
+              alert.description
+                .trim()
+                .split("\n")
+                .filter((desc) => desc.trim() !== "")
+                .slice(0, 4)
+            );
+            return alert.description
+              .trim()
+              .split("\n")
+              .filter((desc) => desc.trim() !== "")
+              .map((desc) => desc.trim())
+              .slice(0, 4)
+              .join("\n");
+          })
+          .join("\n\n");
+
+  const weatherAlertsContainer = createElem(
     "div",
     { class: "weather-alerts_container" },
     {},
@@ -776,12 +798,12 @@ const createWeatherAlerts = (queryData) =>
       "div",
       { class: "weather-desc_container" },
       {},
-      createElem("h2", { class: "weather-desc-title" }, {}, "Description"),
+      createElem("h2", { class: "weather-desc-title" }, {}, "Current Weather"),
       createElem(
         "p",
         { class: "weather-desc_content" },
         {},
-        queryData.description
+        queryData.description || "No description available."
       )
     ),
     createElem(
@@ -794,19 +816,11 @@ const createWeatherAlerts = (queryData) =>
         {},
         "Extreme Weather Alerts"
       ),
-      createElem(
-        "p",
-        { class: "extreme-weather-content" },
-        {},
-        queryData.alerts.length === 0
-          ? "No alerts to display."
-          : queryData.alerts.forEach((alert) => {
-              alert;
-            })
-      )
+      createElem("p", { class: "extreme-weather-content" }, {}, alertsContent)
     )
   );
-
+  return weatherAlertsContainer;
+};
 function selectDisplay(btn, queryData) {
   const rangeBtn = document.querySelector(".range-select_btn.active");
   const controls = document.querySelector(".controls-wrapper");
